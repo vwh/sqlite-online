@@ -79,7 +79,7 @@ export default class Sqlite {
   // This includes the columns, primary key, default values, ...
   private getTableInfo(tableName: string) {
     const [pragmaTableInfoResults] = this.exec(
-      `PRAGMA table_info(${tableName})`
+      `PRAGMA table_info("${tableName}")`
     );
     const [pragmaForeignKeysResults] = this.exec(
       `PRAGMA foreign_key_list("${tableName}")`
@@ -149,7 +149,7 @@ export default class Sqlite {
   // Used for pagination
   private getMaxSizeOfTable(tableName: string, filters?: Filters) {
     const [results] = this.exec(`
-      SELECT COUNT(*) FROM ${tableName} 
+      SELECT COUNT(*) FROM "${tableName}" 
       ${buildWhereClause(filters)}
     `);
 
@@ -168,7 +168,7 @@ export default class Sqlite {
     sorters?: Sorters
   ) {
     const [results] = this.exec(`
-      SELECT * FROM ${table} 
+      SELECT * FROM "${table}" 
       ${buildWhereClause(filters)} 
       ${buildOrderByClause(sorters)} 
       LIMIT ${limit} OFFSET ${offset}
@@ -193,7 +193,7 @@ export default class Sqlite {
       const whereClause = columns
         .map((column) => `${column} = ?`)
         .join(" AND ");
-      const query = `UPDATE ${table} SET ${setClause} WHERE ${whereClause}`;
+      const query = `UPDATE "${table}" SET ${setClause} WHERE ${whereClause}`;
       const stmt = this.db.prepare(query);
 
       stmt.run([...values, ...whereValues]);
@@ -209,7 +209,7 @@ export default class Sqlite {
       const whereClause = columns
         .map((column) => `${column} = ?`)
         .join(" AND ");
-      const query = `DELETE FROM ${table} WHERE ${whereClause}`;
+      const query = `DELETE FROM "${table}" WHERE ${whereClause}`;
       const stmt = this.db.prepare(query);
       stmt.run([...values]);
       stmt.free();
@@ -221,7 +221,7 @@ export default class Sqlite {
   // Insert a row into a table
   public insert(table: string, columns: string[], values: SqlValue[]) {
     try {
-      const query = `INSERT INTO ${table} (${columns.join(
+      const query = `INSERT INTO "${table}" (${columns.join(
         ", "
       )}) VALUES (${columns.map(() => "?").join(", ")})`;
       const stmt = this.db.prepare(query);
@@ -246,7 +246,7 @@ export default class Sqlite {
     filters?: Filters;
     sorters?: Sorters;
   }) {
-    let query = `SELECT * FROM ${table} ${buildWhereClause(
+    let query = `SELECT * FROM "${table}" ${buildWhereClause(
       filters
     )} ${buildOrderByClause(sorters)}`;
     if (offset && limit) query += ` LIMIT ${limit} OFFSET ${offset}`;
