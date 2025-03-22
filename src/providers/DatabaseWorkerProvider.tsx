@@ -176,13 +176,13 @@ export const DatabaseWorkerProvider = ({
       }
       // When the worker encounters an error
       else if (action === "queryError") {
+        setIsDataLoading(false);
         console.error("Worker error:", payload.error);
         if (payload.error.isCustomQueryError) {
           setErrorMessage(payload.error.message);
         } else {
           toast.error(payload.error.message);
         }
-        setIsDataLoading(false);
       } else {
         console.warn("Unknown action:", action);
       }
@@ -280,6 +280,7 @@ export const DatabaseWorkerProvider = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file) return;
+      toast.info("Opening database");
       const reader = new FileReader();
       reader.onload = (e) => {
         const arrayBuffer = e.target?.result as ArrayBuffer;
