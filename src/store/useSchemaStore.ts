@@ -11,13 +11,12 @@ interface SchemaState {
   toggleIndexSection: () => void;
   expandAllTables: (tableSchema: TableSchema) => void;
   collapseAllTables: () => void;
-  resetState: () => void;
 }
 
 export const useSchemaStore = create<SchemaState>((set) => ({
   expandedTables: [],
-  expandedTableSection: true, // Tables section expanded by default
-  expandedIndexSection: true, // Indexes section expanded by default
+  expandedTableSection: true,
+  expandedIndexSection: true,
 
   toggleTable: (tableName: string) =>
     set((state) => ({
@@ -44,12 +43,5 @@ export const useSchemaStore = create<SchemaState>((set) => ({
   collapseAllTables: () =>
     set({
       expandedTables: []
-    }),
-
-  resetState: () =>
-    set({
-      expandedTables: [],
-      expandedTableSection: true,
-      expandedIndexSection: true
     })
 }));

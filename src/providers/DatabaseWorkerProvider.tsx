@@ -69,8 +69,6 @@ export const DatabaseWorkerProvider = ({
   const customQuery = useDatabaseStore((state) => state.customQuery);
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
 
-  const resetEditSection = usePanelStore((state) => state.resetEditSection);
-
   const {
     selectedRowObject,
     setSelectedRowObject,
@@ -145,12 +143,10 @@ export const DatabaseWorkerProvider = ({
         toast.success("Database schema updated successfully");
       } else if (action === "updateComplete") {
         setErrorMessage(null);
-        resetEditSection();
         handleCloseEdit();
         toast.success(`Row ${payload.type} successfully`);
       } else if (action === "insertComplete") {
         setErrorMessage(null);
-        resetEditSection();
         handleCloseEdit();
         toast.success("Row inserted successfully");
       }
@@ -208,7 +204,6 @@ export const DatabaseWorkerProvider = ({
     setErrorMessage,
     setFilters,
     setSorters,
-    resetEditSection,
     setSelectedRowObject,
     handleCloseEdit,
     setIsInserting

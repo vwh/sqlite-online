@@ -5,7 +5,6 @@ import type { SqlValue } from "sql.js";
 interface PanelContextProps {
   handleRowClick: (row: SqlValue[], index: number) => void;
   handleInsert: () => void;
-  handlePanelReset: () => void;
   isEditing: boolean;
   selectedRowObject: { data: SqlValue[]; index: number } | null;
   isInserting: boolean;
@@ -44,12 +43,6 @@ export const PanelProvider = ({ children }: PanelProviderProps) => {
     setIsInserting(true);
   }, []);
 
-  // Handle resetting edit panel
-  const handlePanelReset = useCallback(() => {
-    setIsInserting(false);
-    setSelectedRowObject(null);
-  }, []);
-
   // Handle closing edit panel
   const handleCloseEdit = useCallback(() => {
     setIsInserting(false);
@@ -59,7 +52,6 @@ export const PanelProvider = ({ children }: PanelProviderProps) => {
   const value = {
     handleRowClick,
     handleInsert,
-    handlePanelReset,
     isEditing,
     selectedRowObject,
     isInserting,

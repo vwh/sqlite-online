@@ -46,7 +46,6 @@ interface DatabaseState {
   ) => void;
 
   resetPagination: () => void;
-  resetFiltersAndSorters: () => void;
 }
 
 export const useDatabaseStore = create<DatabaseState>((set) => ({
@@ -87,6 +86,5 @@ export const useDatabaseStore = create<DatabaseState>((set) => ({
     customQueryObject: { data: SqlValue[][]; columns: string[] } | null
   ) => set({ customQueryObject }),
 
-  resetPagination: () => set({ offset: 0 }),
-  resetFiltersAndSorters: () => set({ filters: null, sorters: null })
+  resetPagination: () => set({ offset: 0 })
 }));
