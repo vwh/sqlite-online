@@ -119,7 +119,7 @@ const BrowseDataTab = memo(() => {
             id="schemaPanel"
             defaultSize={schemaPanelSize}
             onResize={setSchemaPanelSize}
-            className={`md:block ${usePanelStore.getState().isMobile ? "" : "relative"} ${isEditing ? "block" : "hidden"}`}
+            className={`static md:relative md:block ${isEditing ? "block" : "hidden"}`}
           >
             <div className="h-full overflow-hidden">
               <div className="h-full overflow-y-auto">
