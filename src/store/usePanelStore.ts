@@ -5,7 +5,7 @@ import type { SqlValue } from "sql.js";
 interface PanelState {
   schemaPanelSize: number;
   dataPanelSize: number;
-  query: string;
+
   editValues: string[];
   selectedRow: { data: SqlValue[]; index: number } | null;
   isInserting: boolean;
@@ -13,16 +13,15 @@ interface PanelState {
 
   setSchemaPanelSize: (size: number) => void;
   setDataPanelSize: (size: number) => void;
-  setQuery: (query: string) => void;
+
   setEditValues: (values: string[]) => void;
   setSelectedRow: (row: { data: SqlValue[]; index: number } | null) => void;
   setIsInserting: (inserting: boolean) => void;
   setIsMobile: (isMobile: boolean) => void;
   resetEditSection: () => void;
-  setPanelsForDevice: () => void;
 }
 
-export const usePanelStore = create<PanelState>((set, get) => {
+export const usePanelStore = create<PanelState>((set) => {
   const debouncedSetSchemaPanelSize = debounce((size: number) => {
     set({ schemaPanelSize: size });
   }, 200);
@@ -32,21 +31,17 @@ export const usePanelStore = create<PanelState>((set, get) => {
   }, 200);
 
   return {
-    schemaPanelSize: 0,
-    dataPanelSize: 100,
-    topPanelSize: 0,
-    bottomPanelSize: 100,
-    query: "",
+    schemaPanelSize: 25,
+    dataPanelSize: 75,
+
     editValues: [],
     selectedRow: null,
     isInserting: false,
     isMobile: window.matchMedia("(max-width: 768px)").matches,
 
-    // Use the debounced/throttled setters here
     setSchemaPanelSize: debouncedSetSchemaPanelSize,
     setDataPanelSize: debouncedSetDataPanelSize,
 
-    setQuery: (query) => set({ query }),
     setEditValues: (values) => set({ editValues: values }),
     setSelectedRow: (row) => set({ selectedRow: row }),
     setIsInserting: (inserting) => set({ isInserting: inserting }),
@@ -59,14 +54,6 @@ export const usePanelStore = create<PanelState>((set, get) => {
           selectedRow: null
         };
         return updates;
-      }),
-
-    setPanelsForDevice: () =>
-      set(() => {
-        const isMobile = get().isMobile;
-        return isMobile
-          ? { schemaPanelSize: 0, dataPanelSize: 100 }
-          : { schemaPanelSize: 25, dataPanelSize: 75 };
       })
   };
 });

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useCallback,
-  useState
-} from "react";
-import { usePanelStore } from "@/store/usePanelStore";
+import { createContext, useContext, useCallback, useState } from "react";
 
 import type { SqlValue } from "sql.js";
 
@@ -30,8 +23,6 @@ interface PanelProviderProps {
 }
 
 export const PanelProvider = ({ children }: PanelProviderProps) => {
-  const setPanelsForDevice = usePanelStore((state) => state.setPanelsForDevice);
-
   const [selectedRowObject, setSelectedRowObject] = useState<{
     data: SqlValue[];
     index: number;
@@ -40,11 +31,6 @@ export const PanelProvider = ({ children }: PanelProviderProps) => {
 
   // Detect if in editing mode
   const isEditing = selectedRowObject !== null || isInserting;
-
-  // Set panel sizes when page loads
-  useEffect(() => {
-    setPanelsForDevice();
-  }, [setPanelsForDevice]);
 
   // Handle row click to toggle edit panel
   const handleRowClick = useCallback((row: SqlValue[], index: number) => {
@@ -69,14 +55,6 @@ export const PanelProvider = ({ children }: PanelProviderProps) => {
     setIsInserting(false);
     setSelectedRowObject(null);
   }, []);
-
-  // Switch to execute tab and adjust panels
-  // const expandDataPanel = useCallback(() => {
-  //   if (usePanelStore.getState().isMobile) {
-  //     setDataPanelSize(100);
-  //     setSchemaPanelSize(0);
-  //   }
-  // }, [setDataPanelSize, setSchemaPanelSize]);
 
   const value = {
     handleRowClick,

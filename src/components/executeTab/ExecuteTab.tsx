@@ -84,12 +84,12 @@ const ExecuteTab = () => {
             </ResizablePanelGroup>
           </ResizablePanel>
 
-          <ResizableHandle withHandle />
+          <ResizableHandle className="hidden md:flex" withHandle />
 
           <ResizablePanel
             defaultSize={schemaPanelSize}
             onResize={setSchemaPanelSize}
-            className=""
+            className="hidden md:block"
           >
             <div className="h-full overflow-hidden">
               <div className="h-full overflow-y-auto">
