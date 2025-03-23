@@ -23,7 +23,7 @@ export default function App() {
             key="structure"
             disabled={isDatabaseLoading}
             value="structure"
-            className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs data-[state=active]:border-b-2"
+            className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
           >
             Database Structure
           </TabsTrigger>
@@ -32,7 +32,7 @@ export default function App() {
             key="data"
             disabled={isDatabaseLoading}
             value="data"
-            className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs data-[state=active]:border-b-2"
+            className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
           >
             Browse Data
           </TabsTrigger>
@@ -41,7 +41,7 @@ export default function App() {
             id="execute"
             key="execute"
             value="execute"
-            className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs data-[state=active]:border-b-2"
+            className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
           >
             Execute SQL
           </TabsTrigger>

@@ -18,7 +18,7 @@ createRoot(document.getElementById("root") as HTMLElement).render(
           <App />
         </DatabaseWorkerProvider>
       </PanelProvider>
-      <Toaster richColors />
+      <Toaster />
     </ThemeProvider>
   </StrictMode>
 );

@@ -102,7 +102,7 @@ const EditSection = () => {
             onClick={() => handleEditSubmit("delete")}
             aria-label="Delete row"
           >
-            <Trash2Icon className="h-3 w-3" />
+            <Trash2Icon className="h-2 w-2" />
           </Button>
         )}
       </div>
