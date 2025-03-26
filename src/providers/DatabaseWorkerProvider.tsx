@@ -104,6 +104,7 @@ export const DatabaseWorkerProvider = ({
         setSorters(null);
         setSelectedRowObject(null);
         setIsInserting(false);
+        setOffset(0);
         setIsDatabaseLoading(false);
       }
       // When the query is executed and returns results
@@ -193,6 +194,7 @@ export const DatabaseWorkerProvider = ({
     };
   }, [
     setColumns,
+    setOffset,
     setIsDatabaseLoading,
     setTablesSchema,
     setCurrentTable,
