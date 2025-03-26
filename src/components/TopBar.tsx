@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "@/components/theme/ModeToggle";
 
-import { DatabaseIcon, SaveIcon } from "lucide-react";
+import { DatabaseIcon, SaveIcon, GithubIcon } from "lucide-react";
 
 const TopBar = () => {
   const { handleFileChange, handleDownload } = useDatabaseWorker();
@@ -38,6 +38,20 @@ const TopBar = () => {
           Save Database
         </Button>
       </section>
+      <a
+        href="https://github.com/vwh/sqlite-online"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <Button
+          size="sm"
+          variant="outline"
+          className="text-xs"
+          title="Source Code"
+        >
+          <GithubIcon className="h-3 w-3" />
+        </Button>
+      </a>
       <ModeToggle />
     </header>
   );
