@@ -4,7 +4,11 @@ import { createContext, useContext, useCallback, useState } from "react";
 import type { SqlValue } from "sql.js";
 
 interface PanelContextProps {
-  handleRowClick: (row: SqlValue[], index: number) => void;
+  handleRowClick: (
+    row: SqlValue[],
+    index: number,
+    primaryValue: SqlValue
+  ) => void;
   handleInsert: () => void;
   isEditing: boolean;
   selectedRowObject: {
@@ -37,27 +41,13 @@ export const PanelProvider = ({ children }: PanelProviderProps) => {
   // Detect if in editing mode
   const isEditing = selectedRowObject !== null || isInserting;
 
-  const { columns, tablesSchema, currentTable, offset } = useDatabaseStore(
-    (state) => state
-  );
-
   // Handle row click to toggle edit panel
   const handleRowClick = useCallback(
-    (row: SqlValue[], index: number) => {
-      let primaryValue = `${offset + 1 + index}` as SqlValue; // the default rowid if no primary key exists
-      if (tablesSchema[currentTable!].primaryKey !== "__rowid__") {
-        for (const col of tablesSchema[currentTable!].schema) {
-          if (col.isPrimaryKey) {
-            const i = columns?.findIndex((column) => column === col.name);
-            if (i !== undefined) primaryValue = row[i];
-          }
-        }
-      }
-
+    (row: SqlValue[], index: number, primaryValue: SqlValue) => {
       setIsInserting(false);
       setSelectedRowObject({ data: row, index: index, primaryValue });
     },
-    [columns, tablesSchema, currentTable, offset]
+    []
   );
 
   // Handle insert row button click

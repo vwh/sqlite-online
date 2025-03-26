@@ -101,37 +101,40 @@ const DataTable = () => {
         </TableHeader>
         <TableBody>
           {data && data.length > 0 ? (
-            data.map((row, i) => (
-              <TableRow
-                key={i}
-                onClick={() => handleRowClick(row, i)}
-                className={`hover:bg-primary/5 cursor-pointer text-xs ${
-                  selectedRowObject?.index === i ? "bg-primary/5" : ""
-                }`}
-              >
-                {row.map((value, j) => (
-                  <TableCell key={j} className="p-2">
-                    {/* Check if it is blob and show a <span>blob</span> */}
-                    {value ? (
-                      <>
-                        {tablesSchema[currentTable!].schema[j]?.type ===
-                        "BLOB" ? (
-                          <span className="text-muted-foreground italic">
-                            BLOB
-                          </span>
-                        ) : (
-                          <Span>{value}</Span>
-                        )}
-                      </>
-                    ) : (
-                      <span className="text-muted-foreground italic">
-                        {value === null ? "NULL" : JSON.stringify(value)}
-                      </span>
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            data.map((row, i) => {
+              const displayData = row.slice(1);
+              return (
+                <TableRow
+                  key={i}
+                  onClick={() => handleRowClick(displayData, i, row[0])}
+                  className={`hover:bg-primary/5 cursor-pointer text-xs ${
+                    selectedRowObject?.index === i ? "bg-primary/5" : ""
+                  }`}
+                >
+                  {displayData.map((value, j) => (
+                    <TableCell key={j} className="p-2">
+                      {/* Check if it is blob and show a <span>blob</span> */}
+                      {value ? (
+                        <>
+                          {tablesSchema[currentTable!].schema[j]?.type ===
+                          "BLOB" ? (
+                            <span className="text-muted-foreground italic">
+                              BLOB
+                            </span>
+                          ) : (
+                            <Span>{value}</Span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground italic">
+                          {value === null ? "NULL" : JSON.stringify(value)}
+                        </span>
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell

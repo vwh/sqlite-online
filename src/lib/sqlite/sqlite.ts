@@ -92,7 +92,7 @@ export default class Sqlite {
       }
     }
 
-    let primaryKey = "__rowid__";
+    let primaryKey = "_rowid_";
     const tableSchema: TableSchemaRow[] = [];
     if (pragmaTableInfoResults.length > 0) {
       for (const row of pragmaTableInfoResults[0].values) {
@@ -174,7 +174,7 @@ export default class Sqlite {
     sorters?: Sorters
   ) {
     const [results] = this.exec(`
-      SELECT * FROM "${table}" 
+      SELECT ${this.tablesSchema[table].primaryKey}, * FROM "${table}" 
       ${buildWhereClause(filters)} 
       ${buildOrderByClause(sorters)} 
       LIMIT ${limit} OFFSET ${offset}
