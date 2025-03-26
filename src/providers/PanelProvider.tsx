@@ -1,4 +1,3 @@
-import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { createContext, useContext, useCallback, useState } from "react";
 
 import type { SqlValue } from "sql.js";
