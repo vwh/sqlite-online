@@ -16,7 +16,7 @@ import {
   SquarePenIcon,
   Trash2Icon
 } from "lucide-react";
-import { isText } from "@/lib/sqlite/sqlite-type-check";
+import { isDate, isNumber, isText } from "@/lib/sqlite/sqlite-type-check";
 
 const EditSection = () => {
   const { handleEditSubmit } = useDatabaseWorker();
@@ -52,6 +52,8 @@ const EditSection = () => {
   const formItems = useMemo(() => {
     if (!columns || !currentTable || !tablesSchema[currentTable]) return null;
 
+    const schema = tablesSchema[currentTable]?.schema;
+
     return columns.map((column, index) => (
       <div key={column}>
         <label
@@ -60,18 +62,15 @@ const EditSection = () => {
         >
           <div className="flex w-full items-center justify-between gap-2">
             <div className="flex items-center gap-1">
-              <ColumnIcon
-                columnSchema={tablesSchema[currentTable]?.schema[index]}
-              />
+              <ColumnIcon columnSchema={schema[index]} />
               <Span className="text-xs font-medium capitalize">{column}</Span>
             </div>
             <span className="text-primary/50 text-xs">
-              {tablesSchema[currentTable]?.schema[index].IsNullable &&
-                "Nullable"}
+              {schema[index].IsNullable && "Nullable"}
             </span>
           </div>
         </label>
-        {isText(tablesSchema[currentTable]?.schema[index]?.type || "") ? (
+        {isText(schema[index]?.type || "") ? (
           <Textarea
             id={column}
             name={column}
@@ -86,7 +85,13 @@ const EditSection = () => {
           <Input
             id={column}
             name={column}
-            type="text"
+            type={
+              isNumber(schema[index]?.type || "")
+                ? "number"
+                : isDate(schema[index]?.type || "")
+                  ? "date"
+                  : "text"
+            }
             className="border-primary/20 h-8 rounded-none text-sm text-[0.8rem]!"
             value={editValues[index] || ""}
             onChange={(e) => handleEditInputChange(index, e.target.value)}
