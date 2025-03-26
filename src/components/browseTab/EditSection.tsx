@@ -58,10 +58,18 @@ const EditSection = () => {
           htmlFor={column}
           className="bg-primary/5 flex items-center gap-1 rounded-sm p-2"
         >
-          <ColumnIcon
-            columnSchema={tablesSchema[currentTable]?.schema[index]}
-          />
-          <Span className="text-xs font-medium capitalize">{column}</Span>
+          <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex items-center gap-1">
+              <ColumnIcon
+                columnSchema={tablesSchema[currentTable]?.schema[index]}
+              />
+              <Span className="text-xs font-medium capitalize">{column}</Span>
+            </div>
+            <span className="text-primary/50 text-xs">
+              {tablesSchema[currentTable]?.schema[index].IsNullable &&
+                "Nullable"}
+            </span>
+          </div>
         </label>
         {isText(tablesSchema[currentTable]?.schema[index]?.type || "") ? (
           <Textarea
