@@ -28,7 +28,7 @@ const TableSelector = () => {
         <SelectContent>
           {Object.keys(tablesSchema).map((table) => (
             <SelectItem key={table} value={table}>
-              <Span className="capitalize">{table}</Span>
+              <Span className="text-[0.8rem]! capitalize">{table}</Span>
             </SelectItem>
           ))}
         </SelectContent>
