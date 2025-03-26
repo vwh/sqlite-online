@@ -428,13 +428,14 @@ export const DatabaseWorkerProvider = ({
   const handleEditSubmit = useCallback(
     (type: "insert" | "update" | "delete") => {
       setIsDataLoading(true);
+
       workerRef.current?.postMessage({
         action: type,
         payload: {
           table: currentTable,
           columns: useDatabaseStore.getState().columns,
           values: usePanelStore.getState().editValues,
-          whereValues: selectedRowObject?.data
+          primaryValue: selectedRowObject?.primaryValue
         }
       });
       // Refresh the data

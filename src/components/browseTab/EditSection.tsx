@@ -78,6 +78,9 @@ const EditSection = () => {
             className="border-primary/20 rounded-none text-sm text-[0.8rem]!"
             value={editValues[index] || ""}
             onChange={(e) => handleEditInputChange(index, e.target.value)}
+            placeholder={
+              tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
+            }
           />
         ) : (
           <Input
@@ -87,6 +90,9 @@ const EditSection = () => {
             className="border-primary/20 h-8 rounded-none text-sm text-[0.8rem]!"
             value={editValues[index] || ""}
             onChange={(e) => handleEditInputChange(index, e.target.value)}
+            placeholder={
+              tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
+            }
           />
         )}
       </div>

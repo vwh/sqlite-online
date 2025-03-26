@@ -124,7 +124,9 @@ const DataTable = () => {
                         )}
                       </>
                     ) : (
-                      <span className="text-muted-foreground italic">NULL</span>
+                      <span className="text-muted-foreground italic">
+                        {value === null ? "NULL" : JSON.stringify(value)}
+                      </span>
                     )}
                   </TableCell>
                 ))}

@@ -60,7 +60,7 @@ interface UpdateEvent {
     table: string;
     columns: string[];
     values: SqlValue[];
-    whereValues: SqlValue[];
+    primaryValue: SqlValue;
   };
 }
 
@@ -68,8 +68,7 @@ interface DeleteEvent {
   action: "delete";
   payload: {
     table: string;
-    columns: string[];
-    values: SqlValue[];
+    primaryValue: SqlValue;
   };
 }
 
@@ -246,9 +245,9 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       }
       // Updates the values of a row in a table
       case "update": {
-        const { table, columns, values, whereValues } =
+        const { table, columns, values, primaryValue } =
           payload as UpdateEvent["payload"];
-        instance.update(table, columns, values, whereValues);
+        instance.update(table, columns, values, primaryValue);
         self.postMessage({
           action: "updateComplete",
           payload: { type: "updated" }
@@ -257,8 +256,8 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       }
       // Deletes a row from a table
       case "delete": {
-        const { table, columns, values } = payload as DeleteEvent["payload"];
-        instance.delete(table, columns, values);
+        const { table, primaryValue } = payload as DeleteEvent["payload"];
+        instance.delete(table, primaryValue);
         self.postMessage({
           action: "updateComplete",
           payload: { type: "deleted" }

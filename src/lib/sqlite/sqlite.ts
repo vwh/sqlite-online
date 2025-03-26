@@ -92,10 +92,13 @@ export default class Sqlite {
       }
     }
 
+    let primaryKey = "__rowid__";
     const tableSchema: TableSchemaRow[] = [];
     if (pragmaTableInfoResults.length > 0) {
       for (const row of pragmaTableInfoResults[0].values) {
         const [cid, name, type, notnull, dflt_value, pk] = row;
+        if (pk === 1) primaryKey = name as string;
+
         tableSchema.push({
           name: (name as string) || "Unknown",
           cid: cid as number,
@@ -110,7 +113,7 @@ export default class Sqlite {
       console.error("No table info found");
     }
 
-    return tableSchema;
+    return [tableSchema, primaryKey] as const;
   }
 
   // Get the schema of the database
@@ -130,9 +133,12 @@ export default class Sqlite {
     for (const row of results[0].values) {
       const [type, name, tableName] = row;
       if (type === "table") {
-        const tableSchema = this.getTableInfo(tableName as string);
+        const [tableSchema, primaryKey] = this.getTableInfo(
+          tableName as string
+        );
         this.tablesSchema[tableName as string] = {
-          schema: tableSchema
+          schema: tableSchema,
+          primaryKey
         };
       } else if (type === "index") {
         this.indexesSchema.push({
@@ -181,51 +187,89 @@ export default class Sqlite {
     return [results, maxSize] as const;
   }
 
-  // Update the values of a row in a table
+  private getPrimaryKey(table: string): string {
+    const tableSchema = this.tablesSchema[table];
+    if (!tableSchema) {
+      throw new Error(`Table "${table}" not found.`);
+    }
+
+    return tableSchema.primaryKey;
+  }
+
+  // Update a row in a table
   public update(
     table: string,
     columns: string[],
     values: SqlValue[],
-    whereValues: SqlValue[]
+    id: SqlValue
   ) {
     try {
-      const setClause = columns.map((column) => `${column} = ?`).join(", ");
-      const whereClause = columns
-        .map((column) => `${column} = ?`)
-        .join(" AND ");
-      const query = `UPDATE "${table}" SET ${setClause} WHERE ${whereClause}`;
-      const stmt = this.db.prepare(query);
+      const primaryKey = this.getPrimaryKey(table);
 
-      stmt.run([...values, ...whereValues]);
+      // Construct the SET clause
+      const setClause = columns.map((column) => `"${column}" = ?`).join(", ");
+
+      // The WHERE clause is based on the primary key
+      const query = `UPDATE "${table}" SET ${setClause} WHERE "${primaryKey}" = ?`;
+
+      // Update values make '' -> NULL
+      values = values.map((value) => (value === "" ? null : value));
+
+      // Prepare and execute the query
+      const stmt = this.db.prepare(query);
+      stmt.run([...values, id]); // Primary key is the last parameter
       stmt.free();
     } catch (error) {
-      throw new Error(`Error while updating table ${table}: ${error}`);
+      if (error instanceof Error) {
+        throw new Error(
+          `Error while updating table ${table}: ${error.message}`
+        );
+      } else {
+        throw new Error(`Error while updating table ${table}: ${error}`);
+      }
     }
   }
 
   // Delete a row from a table
-  public delete(table: string, columns: string[], values: SqlValue[]) {
+  public delete(table: string, id: SqlValue) {
     try {
-      const whereClause = columns
-        .map((column) => `${column} = ?`)
-        .join(" AND ");
-      const query = `DELETE FROM "${table}" WHERE ${whereClause}`;
+      const primaryKey = this.getPrimaryKey(table);
+      const query = `DELETE FROM "${table}" WHERE "${primaryKey}" = ?`;
+
       const stmt = this.db.prepare(query);
-      stmt.run([...values]);
+      stmt.run([id]);
       stmt.free();
     } catch (error) {
-      throw new Error(`Error while deleting from table ${table}: ${error}`);
+      if (error instanceof Error) {
+        throw new Error(
+          `Error while deleting from table ${table}: ${error.message}`
+        );
+      } else {
+        throw new Error(`Error while deleting from table ${table}: ${error}`);
+      }
     }
   }
 
   // Insert a row into a table
   public insert(table: string, columns: string[], values: SqlValue[]) {
     try {
-      const query = `INSERT INTO "${table}" (${columns.join(
-        ", "
-      )}) VALUES (${columns.map(() => "?").join(", ")})`;
+      // Filter out empty values and their corresponding columns
+      const filteredEntries = columns
+        .map((col, index) => ({ col, val: values[index] }))
+        .filter((entry) => entry.val !== "");
+
+      // If there are no valid columns/values, avoid executing an empty INSERT
+      if (filteredEntries.length === 0) {
+        throw new Error("No valid values provided for insertion.");
+      }
+
+      const filteredColumns = filteredEntries.map((entry) => entry.col);
+      const filteredValues = filteredEntries.map((entry) => entry.val);
+
+      const query = `INSERT INTO "${table}" (${filteredColumns.join(", ")}) VALUES (${filteredColumns.map(() => "?").join(", ")})`;
+
       const stmt = this.db.prepare(query);
-      stmt.run([...values]);
+      stmt.run([...filteredValues]);
       stmt.free();
     } catch (error) {
       throw new Error(`Error while inserting into table ${table}: ${error}`);

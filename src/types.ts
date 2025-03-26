@@ -3,6 +3,7 @@
 export type TableSchema = Record<
   string, // Table name
   {
+    primaryKey: "__rowid__" | string;
     schema: TableSchemaRow[];
   }
 >;
