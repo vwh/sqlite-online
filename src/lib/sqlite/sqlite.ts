@@ -98,7 +98,6 @@ export default class Sqlite {
       for (const row of pragmaTableInfoResults[0].values) {
         const [cid, name, type, notnull, dflt_value, pk] = row;
         if (pk === 1) primaryKey = name as string;
-
         tableSchema.push({
           name: (name as string) || "Unknown",
           cid: cid as number,
@@ -187,6 +186,7 @@ export default class Sqlite {
     return [results, maxSize] as const;
   }
 
+  // Get the primary key of a table
   private getPrimaryKey(table: string): string {
     const tableSchema = this.tablesSchema[table];
     if (!tableSchema) {

@@ -26,7 +26,7 @@ const SorterButton = memo(({ column }: { column: string }) => {
             aria-label="Sort Descending"
             onClick={() => handleQuerySorter(column)}
           >
-            <MemoizedArrowDownNarrowWideIcon className="h-4 w-3" />
+            <MemoizedArrowDownNarrowWideIcon className="h-3 w-3" />
           </button>
         ) : (
           <button

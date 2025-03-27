@@ -113,7 +113,6 @@ const DataTable = () => {
                 >
                   {displayData.map((value, j) => (
                     <TableCell key={j} className="p-2">
-                      {/* Check if it is blob and show a <span>blob</span> */}
                       {value ? (
                         <>
                           {tablesSchema[currentTable!].schema[j]?.type ===

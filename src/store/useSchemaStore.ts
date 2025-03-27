@@ -1,4 +1,3 @@
-// Store file: useSchemaStore.ts
 import { create } from "zustand";
 import type { TableSchema } from "@/types";
 

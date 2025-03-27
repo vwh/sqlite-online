@@ -54,7 +54,7 @@ const CustomQueryDataTable = () => {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={customQueryObject?.columns?.length || 1}
+                    colSpan={customQueryObject.columns.length || 1}
                     className="h-32 text-center"
                   >
                     <div className="flex h-full flex-col items-center justify-center gap-1 px-4">

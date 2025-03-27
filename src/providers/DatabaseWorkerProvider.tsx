@@ -12,7 +12,20 @@ import { usePanelManager } from "./PanelProvider";
 
 import { toast } from "sonner";
 
-import type { Sorters } from "@/types";
+import type {
+  CustomQueryCompleteResponse,
+  DownloadCompleteResponse,
+  EditTypes,
+  ExportCompleteResponse,
+  exportTypes,
+  InitCompleteResponse,
+  QueryCompleteResponse,
+  QueryErrorResponse,
+  Sorters,
+  UpdateCompleteResponse,
+  UpdateInstanceResponse,
+  WorkerResponseEvent
+} from "@/types";
 
 interface DatabaseWorkerContextProps {
   workerRef: React.MutableRefObject<Worker | null>;
@@ -22,9 +35,9 @@ interface DatabaseWorkerContextProps {
   handleQueryFilter: (column: string, value: string) => void;
   handleQuerySorter: (column: string) => void;
   handlePageChange: (type: "next" | "prev" | "first" | "last" | number) => void;
-  handleExport: (exportType: "table" | "current") => void;
+  handleExport: (exportType: exportTypes) => void;
   handleQueryExecute: () => void;
-  handleEditSubmit: (type: "insert" | "update" | "delete") => void;
+  handleEditSubmit: (type: EditTypes) => void;
 }
 
 const DatabaseWorkerContext = createContext<
@@ -87,16 +100,21 @@ export const DatabaseWorkerProvider = ({
     );
 
     // Listen for messages from the worker
-    workerRef.current.onmessage = (event) => {
-      const { action, payload } = event.data;
+    workerRef.current.onmessage = (
+      event: MessageEvent<WorkerResponseEvent>
+    ) => {
+      const workerEvent = event.data;
+      const { action } = workerEvent;
 
       // When the worker is initialized
       if (action === "initComplete") {
+        const { payload } = workerEvent as InitCompleteResponse;
+
         setTablesSchema(payload.tableSchema);
         setIndexesSchema(payload.indexSchema);
         setCurrentTable(payload.currentTable);
         setColumns(
-          payload.tableSchema[payload.currentTable]?.schema?.map(
+          payload.tableSchema[payload.currentTable].schema.map(
             (column: { name: string }) => column.name
           )
         );
@@ -109,50 +127,80 @@ export const DatabaseWorkerProvider = ({
       }
       // When the query is executed and returns results
       else if (action === "queryComplete") {
-        setMaxSize(payload.maxSize);
-        const data = payload.results?.[0]?.values || [];
+        const { payload } = workerEvent as QueryCompleteResponse;
 
+        setMaxSize(payload.maxSize);
+
+        const results = payload.results;
+        if (!results) {
+          setData(null);
+          return;
+        }
+
+        const data = results[0]?.values || [];
         // To be able to cache the columns
         if (data.length !== 0) {
-          setData(payload.results?.[0]?.values || []);
+          setData(data);
         } else {
           setData(null);
         }
+
         setIsDataLoading(false);
       }
       // When the custom query is executed and returns results
       else if (action === "customQueryComplete") {
-        const data = payload.results?.[0]?.values || [];
+        const { payload } = workerEvent as CustomQueryCompleteResponse;
+
+        const results = payload.results;
+        if (!results) {
+          setData(null);
+          return;
+        }
+
+        const data = results[0]?.values || [];
         if (data.length !== 0) {
           setCustomQueryObject({
-            data: payload.results?.[0]?.values || [],
-            columns: payload.results?.[0]?.columns || []
+            data: data,
+            columns: results[0]?.columns || []
           });
         } else {
           setCustomQueryObject(null);
         }
+
         setIsDataLoading(false);
         setErrorMessage(null);
       }
       // When the database is updated and requires a new schema
       else if (action === "updateInstance") {
+        const { payload } = workerEvent as UpdateInstanceResponse;
+
         setTablesSchema(payload.tableSchema);
         setIndexesSchema(payload.indexSchema);
         setIsDataLoading(false);
         setErrorMessage(null);
 
         toast.success("Database schema updated successfully");
-      } else if (action === "updateComplete") {
+      }
+      // When a row is updated
+      else if (action === "updateComplete") {
+        const { payload } = workerEvent as UpdateCompleteResponse;
+
         setErrorMessage(null);
         handleCloseEdit();
+
         toast.success(`Row ${payload.type} successfully`);
-      } else if (action === "insertComplete") {
+      }
+      // When a row is inserted
+      else if (action === "insertComplete") {
         setErrorMessage(null);
         handleCloseEdit();
+
         toast.success("Row inserted successfully");
       }
       // When the database is downloaded
       else if (action === "downloadComplete") {
+        const { payload } = workerEvent as DownloadCompleteResponse;
+
         const blob = new Blob([payload.bytes], {
           type: "application/octet-stream"
         });
@@ -161,7 +209,13 @@ export const DatabaseWorkerProvider = ({
         link.href = url;
         link.download = "database.sqlite";
         link.click();
-      } else if (action === "exportComplete") {
+
+        toast.success("Database downloaded successfully");
+      }
+      // When the database is exported
+      else if (action === "exportComplete") {
+        const { payload } = workerEvent as ExportCompleteResponse;
+
         const blob = new Blob([payload.results], {
           type: "text/csv"
         });
@@ -170,11 +224,17 @@ export const DatabaseWorkerProvider = ({
         link.href = url;
         link.download = "export.csv";
         link.click();
+
+        toast.success("Database exported successfully");
       }
       // When the worker encounters an error
       else if (action === "queryError") {
-        setIsDataLoading(false);
+        const { payload } = workerEvent as QueryErrorResponse;
+
         console.error("Worker error:", payload.error);
+
+        setIsDataLoading(false);
+
         if (payload.error.isCustomQueryError) {
           setErrorMessage(payload.error.message);
         } else {
@@ -186,7 +246,8 @@ export const DatabaseWorkerProvider = ({
     };
 
     setIsDatabaseLoading(true);
-    // Start with a new database instance
+
+    // Request the worker to initialize the demo database
     workerRef.current.postMessage({ action: "init" });
 
     return () => {
@@ -214,11 +275,15 @@ export const DatabaseWorkerProvider = ({
   // When fetching data, ask the worker for new data
   useEffect(() => {
     if (!currentTable) return;
-    // Debounce to prevent too many requests when filters change rapidly
     const handler = setTimeout(() => {
+      if (!workerRef.current) {
+        toast.error("Worker is not initialized");
+        return;
+      }
+
       setIsDataLoading(true);
 
-      // limit of the data per page
+      // Limit of the data depends on the hight of the table on the screen
       let limit = 50;
       const tableHeaderHight = document
         .getElementById("tableHeader")
@@ -253,9 +318,11 @@ export const DatabaseWorkerProvider = ({
               tableCellHight
           );
       }
+
       setLimit(limit);
 
-      workerRef.current?.postMessage({
+      // Request data from the worker
+      workerRef.current.postMessage({
         action: "getTableData",
         payload: { currentTable, filters, sorters, limit, offset }
       });
@@ -276,12 +343,24 @@ export const DatabaseWorkerProvider = ({
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
-      if (!file) return;
+      if (!file) {
+        toast.error("No file selected");
+        return;
+      }
+
       toast.info("Opening database");
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const arrayBuffer = e.target?.result as ArrayBuffer;
-        workerRef.current?.postMessage({
+
+        if (!workerRef.current) {
+          toast.error("Worker is not initialized");
+          return;
+        }
+
+        // Send the file to the worker to initialize the database
+        workerRef.current.postMessage({
           action: "openFile",
           payload: { file: arrayBuffer }
         });
@@ -293,7 +372,13 @@ export const DatabaseWorkerProvider = ({
 
   // Handle when user downloads the database
   const handleDownload = useCallback(() => {
-    workerRef.current?.postMessage({ action: "download" });
+    if (!workerRef.current) {
+      toast.error("Worker is not initialized");
+      return;
+    }
+
+    // Request the worker to export and download the database
+    workerRef.current.postMessage({ action: "download" });
   }, []);
 
   // Handle when user changes the table
@@ -326,6 +411,7 @@ export const DatabaseWorkerProvider = ({
     (column: string, value: string) => {
       const currentFilters = useDatabaseStore.getState().filters || {};
       const newFilters = { ...currentFilters, [column]: value };
+
       setFilters(newFilters);
       resetPagination();
     },
@@ -336,11 +422,9 @@ export const DatabaseWorkerProvider = ({
   const handleQuerySorter = useCallback(
     (column: string) => {
       const isMutableColumns = false; // TODO: in settings tab user can change this
-
       const currentSorters = useDatabaseStore.getState().sorters || {};
       const currentSortOrder = currentSorters[column] || "asc";
       const newSortOrder = currentSortOrder === "asc" ? "desc" : "asc";
-
       const newSorters = isMutableColumns
         ? { ...currentSorters, [column]: newSortOrder }
         : { [column]: newSortOrder };
@@ -354,6 +438,7 @@ export const DatabaseWorkerProvider = ({
   const handlePageChange = useCallback(
     (type: "next" | "prev" | "first" | "last" | number) => {
       const currentOffset = useDatabaseStore.getState().offset;
+
       // use currentOffset instead of prev
       if (typeof type === "number") {
         setOffset(type);
@@ -366,6 +451,7 @@ export const DatabaseWorkerProvider = ({
       } else if (type === "last") {
         setOffset(maxSize - limit);
       }
+
       setSelectedRowObject(null);
     },
     [maxSize, limit, setOffset, setSelectedRowObject]
@@ -373,8 +459,14 @@ export const DatabaseWorkerProvider = ({
 
   // Handle when user exports the data
   const handleExport = useCallback(
-    (exportType: "table" | "current") => {
-      workerRef.current?.postMessage({
+    (exportType: exportTypes) => {
+      if (!workerRef.current) {
+        toast.error("Worker is not initialized");
+        return;
+      }
+
+      // Request the worker to export the data
+      workerRef.current.postMessage({
         action: "export",
         payload: {
           table: currentTable,
@@ -391,8 +483,14 @@ export const DatabaseWorkerProvider = ({
 
   // Handle SQL statement execution by sending it to the worker
   const handleQueryExecute = useCallback(() => {
+    if (!workerRef.current) {
+      toast.error("Worker is not initialized");
+      return;
+    }
+
     const query = customQuery;
     if (!query) return;
+
     // Remove SQL comments before processing
     const cleanedQuery = query
       .replace(/--.*$/gm, "")
@@ -402,9 +500,12 @@ export const DatabaseWorkerProvider = ({
       .split(";")
       .map((stmt) => stmt.trim())
       .filter((stmt) => stmt !== "");
+
     for (const stmt of statements) {
       setIsDataLoading(true);
-      workerRef.current?.postMessage({
+
+      // Request the worker to execute the query
+      workerRef.current.postMessage({
         action: "exec",
         payload: {
           query: stmt,
@@ -428,10 +529,16 @@ export const DatabaseWorkerProvider = ({
 
   // Handle when user submits the edit form
   const handleEditSubmit = useCallback(
-    (type: "insert" | "update" | "delete") => {
+    (type: EditTypes) => {
+      if (!workerRef.current) {
+        toast.error("Worker is not initialized");
+        return;
+      }
+
       setIsDataLoading(true);
 
-      workerRef.current?.postMessage({
+      // Request the worker to make the changes
+      workerRef.current.postMessage({
         action: type,
         payload: {
           table: currentTable,
@@ -440,8 +547,9 @@ export const DatabaseWorkerProvider = ({
           primaryValue: selectedRowObject?.primaryValue
         }
       });
-      // Refresh the data
-      workerRef.current?.postMessage({
+
+      // Request the worker to refresh the current viewed data
+      workerRef.current.postMessage({
         action: "refresh",
         payload: {
           currentTable: currentTable,

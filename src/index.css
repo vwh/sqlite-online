@@ -157,22 +157,17 @@
     scrollbar-color: var(--muted-foreground) var(--muted);
   }
 
-  /* You might need to add this to elements that should have scrolling */
   .scrollable {
     overflow: auto;
     height: 100%;
     padding-right: 2px; /* Prevent content from bumping against scrollbar */
   }
 
-  /* Your current theme prevents scrolling on body, if you want to enable it: */
   html,
   body {
     height: 100%;
-    /* Change this if you want to allow page scrolling */
-    /* overflow: auto; */
   }
 
-  /* Some elements might need specific scroll behavior */
   .scroll-y {
     overflow-y: auto;
     overflow-x: hidden;
@@ -183,7 +178,6 @@
     overflow-y: hidden;
   }
 
-  /* No scrollbar visibility but still scrollable */
   .scroll-hidden {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
