@@ -12,12 +12,9 @@ import CustomSQLTextarea from "./CustomSQLTextarea";
 import SchemaTree from "@/components/structureTab/SchemaTree";
 import CustomQueryDataTable from "./CustomQueryDataTable";
 
-import { PlayIcon, FolderOutputIcon, LoaderCircleIcon } from "lucide-react";
+import { PlayIcon, LoaderCircleIcon } from "lucide-react";
 
 const ExecuteTab = () => {
-  const customQueryObject = useDatabaseStore(
-    (state) => state.customQueryObject
-  );
   const errorMessage = useDatabaseStore((state) => state.errorMessage);
   const isDataLoading = useDatabaseStore((state) => state.isDataLoading);
   const isDatabaseLoading = useDatabaseStore(
