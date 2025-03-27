@@ -237,6 +237,7 @@ export const DatabaseWorkerProvider = ({
 
         if (payload.error.isCustomQueryError) {
           setErrorMessage(payload.error.message);
+          toast.error(payload.error.message);
         } else {
           toast.error(payload.error.message);
         }
