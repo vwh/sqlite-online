@@ -37,14 +37,15 @@ const ExecuteTab = () => {
         <Button
           size="sm"
           variant="outline"
-          className="text-xs"
+          className="w-[150px] text-xs"
           onClick={handleQueryExecute}
           title="Execute SQL"
         >
           <PlayIcon className="mr-1 h-3 w-3" />
           Execute SQL
         </Button>
-        <Button
+        {/* TODO: Export data */}
+        {/* <Button
           size="sm"
           variant="outline"
           className="text-xs"
@@ -52,7 +53,7 @@ const ExecuteTab = () => {
         >
           <FolderOutputIcon className="mr-1 h-3 w-3" />
           Export data
-        </Button>
+        </Button> */}
         {(isDataLoading || isDatabaseLoading) && (
           <span className="ml-2 flex items-center text-xs text-gray-500">
             <LoaderCircleIcon className="mr-1 h-3 w-3 animate-spin" />
