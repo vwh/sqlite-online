@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
 import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
@@ -12,10 +14,11 @@ import CustomSQLTextarea from "./CustomSQLTextarea";
 import SchemaTree from "@/components/structureTab/SchemaTree";
 import CustomQueryDataTable from "./CustomQueryDataTable";
 
-import { PlayIcon, LoaderCircleIcon } from "lucide-react";
+import { PlayIcon, LoaderCircleIcon, XIcon } from "lucide-react";
 
 const ExecuteTab = () => {
   const errorMessage = useDatabaseStore((state) => state.errorMessage);
+  const setErrorMessage = useDatabaseStore((state) => state.setErrorMessage);
   const isDataLoading = useDatabaseStore((state) => state.isDataLoading);
   const isDatabaseLoading = useDatabaseStore(
     (state) => state.isDatabaseLoading
@@ -27,6 +30,10 @@ const ExecuteTab = () => {
   const setSchemaPanelSize = usePanelStore((state) => state.setSchemaPanelSize);
 
   const { handleQueryExecute } = useDatabaseWorker();
+
+  const handleErrorClose = useCallback(() => {
+    setErrorMessage(null);
+  }, [setErrorMessage]);
 
   return (
     <div className="flex h-full flex-col">
@@ -68,7 +75,17 @@ const ExecuteTab = () => {
             <ResizablePanelGroup direction="vertical">
               <ResizablePanel defaultSize={25}>
                 {errorMessage && (
-                  <div className="p-2 text-sm text-red-400">{errorMessage}</div>
+                  <div className="flex items-center justify-between p-2">
+                    <div className="text-sm text-red-400">{errorMessage}</div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs"
+                      onClick={handleErrorClose}
+                    >
+                      <XIcon className="h-3 w-3" />
+                    </Button>
+                  </div>
                 )}
                 <CustomSQLTextarea />
               </ResizablePanel>
