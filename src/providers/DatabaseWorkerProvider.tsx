@@ -292,9 +292,9 @@ export const DatabaseWorkerProvider = ({
       const dataSectionHight = document
         .getElementById("dataSection")
         ?.getBoundingClientRect().height;
-      const tableCellHight = document
-        .getElementById("tableCell")
-        ?.getBoundingClientRect().height;
+      // const tableCellHight = document
+      //   .getElementById("tableCell")
+      //   ?.getBoundingClientRect().height;
       const paginationControlsHight = document
         .getElementById("paginationControls")
         ?.getBoundingClientRect().height;
@@ -312,11 +312,10 @@ export const DatabaseWorkerProvider = ({
           tableHeaderHight &&
           dataSectionHight &&
           paginationControlsHight &&
-          tableCellHight
+          33 // tableCell hight
         )
           limit = Math.floor(
-            (dataSectionHight - tableHeaderHight - paginationControlsHight) /
-              tableCellHight
+            (dataSectionHight - tableHeaderHight - paginationControlsHight) / 33 // tableCell hight
           );
       }
 
