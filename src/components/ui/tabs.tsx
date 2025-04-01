@@ -1,9 +1,9 @@
-import React, { memo } from "react";
+import type React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn } from "@/lib/utils";
 
-const Tabs = memo(function Tabs({
+const Tabs = function Tabs({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
@@ -14,7 +14,7 @@ const Tabs = memo(function Tabs({
       {...props}
     />
   );
-});
+};
 
 function TabsList({
   className,
@@ -32,7 +32,7 @@ function TabsList({
   );
 }
 
-const TabsTrigger = React.memo(function TabsTrigger({
+const TabsTrigger = function TabsTrigger({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
@@ -46,9 +46,9 @@ const TabsTrigger = React.memo(function TabsTrigger({
       {...props}
     />
   );
-});
+};
 
-const TabsContent = React.memo(function TabsContent({
+const TabsContent = function TabsContent({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Content>) {
@@ -59,6 +59,6 @@ const TabsContent = React.memo(function TabsContent({
       {...props}
     />
   );
-});
+};
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };

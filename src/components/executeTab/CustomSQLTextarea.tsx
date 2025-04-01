@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { useTheme } from "@/providers/ThemeProvider";
 
@@ -171,44 +171,40 @@ export default function CustomSQLTextarea() {
   const setCustomQuery = useDatabaseStore((state) => state.setCustomQuery);
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
 
-  const completionOptionsRef = useRef<Array<{ label: string; type: string }>>(
-    []
-  );
-
   const { tableNames, columnNames } = useMemo(() => {
     const tableNames = Object.keys(tablesSchema);
     const columnNames = tableNames.flatMap((table) =>
       tablesSchema[table].schema.map((col) => col.name)
     );
-
     return { tableNames, columnNames };
   }, [tablesSchema]);
 
-  // Memoize completion options only when dependencies change
+  // Compute completion options directly with useMemo
   const completionOptions = useMemo(() => {
-    if (
-      !completionOptionsRef.current ||
-      tableNames.length !== completionOptionsRef.current.length
-    ) {
-      completionOptionsRef.current = [
-        ...SQLITE_KEYWORDS.map((keyword) => ({
-          label: keyword,
-          type: "keyword"
-        })),
-        ...BUILT_IN_FUNCTIONS.map((fn) => ({ label: fn, type: "function" })),
-        ...tableNames.map((table) => ({ label: table, type: "table" })),
-        ...columnNames.map((column) => ({ label: column, type: "column" }))
-      ];
-    }
-
-    return completionOptionsRef.current;
+    return [
+      ...SQLITE_KEYWORDS.map((keyword) => ({
+        label: keyword,
+        type: "keyword"
+      })),
+      ...BUILT_IN_FUNCTIONS.map((fn) => ({
+        label: fn,
+        type: "function"
+      })),
+      ...tableNames.map((table) => ({
+        label: table,
+        type: "table"
+      })),
+      ...columnNames.map((column) => ({
+        label: column,
+        type: "column"
+      }))
+    ];
   }, [tableNames, columnNames]);
 
   const myCompletions = useCallback(
     (context: CompletionContext) => {
       const word = context.matchBefore(/\w*/);
       if (!word || (word.from === word.to && !context.explicit)) return null;
-
       return {
         from: word.from,
         to: word.to,
@@ -218,7 +214,7 @@ export default function CustomSQLTextarea() {
     [completionOptions]
   );
 
-  // Debounce the change handler to reduce frequent updates
+  // Handle changes in the editor and update state if needed
   const handleChange = useCallback(
     (newValue: string) => {
       if (newValue !== customQuery) {
@@ -228,7 +224,6 @@ export default function CustomSQLTextarea() {
     [customQuery, setCustomQuery]
   );
 
-  // Memoize extensions
   const extensions = useMemo(
     () => [SQLite, sql(), autocompletion({ override: [myCompletions] })],
     [myCompletions]

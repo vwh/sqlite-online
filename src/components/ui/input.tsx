@@ -1,6 +1,6 @@
 import type * as React from "react";
+
 import { cn } from "@/lib/utils";
-import { memo } from "react";
 
 const InputComponent = ({
   className,
@@ -22,4 +22,4 @@ const InputComponent = ({
   );
 };
 
-export const Input = memo(InputComponent);
+export const Input = InputComponent;

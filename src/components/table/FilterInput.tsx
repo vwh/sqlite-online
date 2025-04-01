@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { useCallback } from "react";
 
 import { Input } from "@/components/ui/input";
 
@@ -8,7 +8,7 @@ interface FilterInputProps {
   onChange: (column: string, value: string) => void;
 }
 
-const FilterInput = memo(({ column, value, onChange }: FilterInputProps) => {
+const FilterInput = ({ column, value, onChange }: FilterInputProps) => {
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
       onChange(column, e.target.value),
@@ -24,6 +24,6 @@ const FilterInput = memo(({ column, value, onChange }: FilterInputProps) => {
       placeholder="Filter"
     />
   );
-});
+};
 
 export default FilterInput;

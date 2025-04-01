@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import type { VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import buttonVariants from "./buttonVariants";
-import { memo, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -44,4 +44,4 @@ const ButtonComponent = ({
   );
 };
 
-export const Button = memo(ButtonComponent);
+export const Button = ButtonComponent;

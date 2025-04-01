@@ -1,4 +1,3 @@
-import { useMemo, memo } from "react";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
 import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
@@ -24,7 +23,7 @@ import {
   FolderOutputIcon
 } from "lucide-react";
 
-const BrowseDataTab = memo(() => {
+const BrowseDataTab = () => {
   const filters = useDatabaseStore((state) => state.filters);
   const sorters = useDatabaseStore((state) => state.sorters);
   const setFilters = useDatabaseStore((state) => state.setFilters);
@@ -42,7 +41,7 @@ const BrowseDataTab = memo(() => {
   const { handleExport } = useDatabaseWorker();
   const { isEditing } = usePanelManager();
 
-  const actionButtons = useMemo(() => {
+  const ActionButtons = () => {
     return (
       <>
         <div className="hidden items-center gap-1 md:flex">
@@ -84,13 +83,13 @@ const BrowseDataTab = memo(() => {
         </div>
       </>
     );
-  }, [filters, sorters, setFilters, setSorters, handleExport]);
+  };
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-1 border-b px-1 py-2">
         <TableSelector />
-        {actionButtons}
+        <ActionButtons />
         {(isDataLoading || isDatabaseLoading) && (
           <LoadingIndicator text="Loading data" />
         )}
@@ -139,7 +138,7 @@ const BrowseDataTab = memo(() => {
       </div>
     </div>
   );
-});
+};
 
 const LoadingIndicator = ({ text }: { text: string }) => (
   <span className="ml-2 flex items-center text-xs text-gray-500">

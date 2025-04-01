@@ -3,43 +3,47 @@ import { defineConfig } from "vite";
 
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import MillionLint from "@million/lint";
 import compression from "vite-plugin-compression";
 import viteImagemin from "vite-plugin-imagemin";
+import babelReactCompiler from "babel-plugin-react-compiler";
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [babelReactCompiler]
+      }
+    }),
     tailwindcss(),
-    MillionLint.vite(),
+    // MillionLint.vite(),
     compression(),
     viteImagemin({
       gifsicle: {
         optimizationLevel: 7,
-        interlaced: false,
+        interlaced: false
       },
       optipng: {
-        optimizationLevel: 7,
+        optimizationLevel: 7
       },
       mozjpeg: {
-        quality: 20,
+        quality: 20
       },
       pngquant: {
         quality: [0.8, 0.9],
-        speed: 4,
+        speed: 4
       },
       svgo: {
         plugins: [
           {
-            name: "removeViewBox",
+            name: "removeViewBox"
           },
           {
             name: "removeEmptyAttrs",
-            active: false,
-          },
-        ],
-      },
-    }),
+            active: false
+          }
+        ]
+      }
+    })
   ],
   build: {
     rollupOptions: {
@@ -52,13 +56,13 @@ export default defineConfig({
               .split("/")[0]
               .toString();
           }
-        },
-      },
-    },
+        }
+      }
+    }
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
+      "@": path.resolve(__dirname, "./src")
+    }
+  }
 });

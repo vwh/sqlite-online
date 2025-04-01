@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
 
@@ -16,28 +15,20 @@ const TableSelector = () => {
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
   const currentTable = useDatabaseStore((state) => state.currentTable);
 
-  const TableSelect = useMemo(
-    () => (
-      <Select
-        onValueChange={handleTableChange}
-        value={currentTable || undefined}
-      >
-        <SelectTrigger className="border-primary/20 h-8 w-30 border text-sm sm:w-48">
-          <SelectValue placeholder="Select Table" />
-        </SelectTrigger>
-        <SelectContent>
-          {Object.keys(tablesSchema).map((table) => (
-            <SelectItem key={table} value={table}>
-              <Span className="text-[0.8rem]! capitalize">{table}</Span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    ),
-    [tablesSchema, currentTable, handleTableChange]
+  return (
+    <Select onValueChange={handleTableChange} value={currentTable || undefined}>
+      <SelectTrigger className="border-primary/20 h-8 w-30 border text-sm sm:w-48">
+        <SelectValue placeholder="Select Table" />
+      </SelectTrigger>
+      <SelectContent>
+        {Object.keys(tablesSchema).map((table) => (
+          <SelectItem key={table} value={table}>
+            <Span className="text-[0.8rem]! capitalize">{table}</Span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
-
-  return TableSelect;
 };
 
 export default TableSelector;

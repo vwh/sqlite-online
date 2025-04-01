@@ -1,9 +1,8 @@
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { memo } from "react";
 
-const Table = memo(function Table({
+const Table = function Table({
   className,
   ...props
 }: React.ComponentProps<"table">) {
@@ -19,9 +18,9 @@ const Table = memo(function Table({
       />
     </div>
   );
-});
+};
 
-const TableHeader = memo(function TableHeader({
+const TableHeader = function TableHeader({
   className,
   ...props
 }: React.ComponentProps<"thead">) {
@@ -33,9 +32,9 @@ const TableHeader = memo(function TableHeader({
       {...props}
     />
   );
-});
+};
 
-const TableBody = memo(function TableBody({
+const TableBody = function TableBody({
   className,
   ...props
 }: React.ComponentProps<"tbody">) {
@@ -46,9 +45,9 @@ const TableBody = memo(function TableBody({
       {...props}
     />
   );
-});
+};
 
-const TableFooter = memo(function TableFooter({
+const TableFooter = function TableFooter({
   className,
   ...props
 }: React.ComponentProps<"tfoot">) {
@@ -62,9 +61,9 @@ const TableFooter = memo(function TableFooter({
       {...props}
     />
   );
-});
+};
 
-const TableRow = memo(function TableRow({
+const TableRow = function TableRow({
   className,
   ...props
 }: React.ComponentProps<"tr">) {
@@ -78,9 +77,9 @@ const TableRow = memo(function TableRow({
       {...props}
     />
   );
-});
+};
 
-const TableHead = memo(function TableHead({
+const TableHead = function TableHead({
   className,
   ...props
 }: React.ComponentProps<"th">) {
@@ -94,9 +93,9 @@ const TableHead = memo(function TableHead({
       {...props}
     />
   );
-});
+};
 
-const TableCell = memo(function TableCell({
+const TableCell = function TableCell({
   className,
   ...props
 }: React.ComponentProps<"td">) {
@@ -111,7 +110,7 @@ const TableCell = memo(function TableCell({
       {...props}
     />
   );
-});
+};
 
 // function TableCaption({
 //   className,

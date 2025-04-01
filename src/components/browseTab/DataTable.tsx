@@ -28,7 +28,7 @@ const DataTable = () => {
   const setFilters = useDatabaseStore((state) => state.setFilters);
 
   const { handleQueryFilter } = useDatabaseWorker();
-  const { handleRowClick, selectedRowObject } = usePanelManager();
+  const { handleRowClick } = usePanelManager();
 
   const emptyDataContent = useMemo(
     () => (
@@ -72,91 +72,77 @@ const DataTable = () => {
     ));
   }, [columns, filters, handleQueryFilter]);
 
-  return useMemo(
-    () => (
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-primary/5">
-            {columns && currentTable ? (
-              columns.map((column, index) => (
-                <TableHead key={column} className="p-1 text-xs">
-                  <div className="flex items-center gap-1 py-[1.5px]">
-                    <SorterButton column={column} />
-                    <Span className="text-foreground font-medium capitalize">
-                      {column}
-                    </Span>
-                    <ColumnIcon
-                      columnSchema={tablesSchema[currentTable].schema[index]}
-                    />
-                  </div>
-                  {memoizedFilterInput?.[index]}
-                </TableHead>
-              ))
-            ) : (
-              <TableHead>
-                <p className="text-xs">No columns found</p>
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow className="bg-primary/5">
+          {columns && currentTable ? (
+            columns.map((column, index) => (
+              <TableHead key={column} className="p-1 text-xs">
+                <div className="flex items-center gap-1 py-[1.5px]">
+                  <SorterButton column={column} />
+                  <Span className="text-foreground font-medium capitalize">
+                    {column}
+                  </Span>
+                  <ColumnIcon
+                    columnSchema={tablesSchema[currentTable].schema[index]}
+                  />
+                </div>
+                {memoizedFilterInput?.[index]}
               </TableHead>
-            )}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data && data.length > 0 ? (
-            data.map((row, i) => {
-              const displayData = row.slice(1);
-              return (
-                <TableRow
-                  key={i}
-                  onClick={() => handleRowClick(displayData, i, row[0])}
-                  className={`hover:bg-primary/5 cursor-pointer text-xs ${
-                    selectedRowObject?.index === i ? "bg-primary/5" : ""
-                  }`}
-                >
-                  {displayData.map((value, j) => (
-                    <TableCell key={j} className="p-2">
-                      {value ? (
-                        <>
-                          {tablesSchema[currentTable!].schema[j]?.type ===
-                          "BLOB" ? (
-                            <span className="text-muted-foreground italic">
-                              BLOB
-                            </span>
-                          ) : (
-                            <Span>{value}</Span>
-                          )}
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground italic">
-                          {value === null ? "NULL" : JSON.stringify(value)}
-                        </span>
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              );
-            })
+            ))
           ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns?.length || 1}
-                className="h-32 text-center"
-              >
-                {emptyDataContent}
-              </TableCell>
-            </TableRow>
+            <TableHead>
+              <p className="text-xs">No columns found</p>
+            </TableHead>
           )}
-        </TableBody>
-      </Table>
-    ),
-    [
-      data,
-      columns,
-      currentTable,
-      tablesSchema,
-      handleRowClick,
-      selectedRowObject,
-      emptyDataContent,
-      memoizedFilterInput
-    ]
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {data && data.length > 0 ? (
+          data.map((row, i) => {
+            const displayData = row.slice(1);
+            return (
+              <TableRow
+                key={i}
+                onClick={() => handleRowClick(displayData, i, row[0])}
+                className="hover:bg-primary/5 focus:bg-primary/5 cursor-pointer text-xs"
+              >
+                {displayData.map((value, j) => (
+                  <TableCell key={j} className="p-2">
+                    {value ? (
+                      <>
+                        {tablesSchema[currentTable!].schema[j]?.type ===
+                        "BLOB" ? (
+                          <span className="text-muted-foreground italic">
+                            BLOB
+                          </span>
+                        ) : (
+                          <Span>{value}</Span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground italic">
+                        {value === null ? "NULL" : JSON.stringify(value)}
+                      </span>
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+          })
+        ) : (
+          <TableRow>
+            <TableCell
+              colSpan={columns?.length || 1}
+              className="h-32 text-center"
+            >
+              {emptyDataContent}
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 };
 
