@@ -8,14 +8,15 @@ const useKeyPress = (
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const keys = keyCombo.split("+");
-      const ctrlPressed = keys.includes("ctrl") ? event.ctrlKey : true;
+      const isCtrlRequired = keys.includes("ctrl");
 
       let eventKey = event.key;
       if (!caseSensitive) {
         eventKey = eventKey.toLowerCase();
       }
 
-      const keyPressed = keys.some((key) =>
+      const isCtrlPressed = event.ctrlKey || !isCtrlRequired;
+      const isKeyMatched = keys.some((key) =>
         key === "ctrl"
           ? false
           : caseSensitive
@@ -23,8 +24,9 @@ const useKeyPress = (
             : key.toLowerCase() === eventKey
       );
 
-      if (ctrlPressed && keyPressed) {
+      if (isCtrlPressed && isKeyMatched) {
         event.preventDefault();
+        event.stopPropagation();
         callback();
       }
     };
