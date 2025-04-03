@@ -552,8 +552,6 @@ export const DatabaseWorkerProvider = ({
         return;
       }
 
-      setIsDataLoading(true);
-
       if (!selectedRowObject?.primaryValue) {
         if (type === "delete") {
           toast.error("No row selected to delete");
@@ -562,6 +560,8 @@ export const DatabaseWorkerProvider = ({
         }
         return;
       }
+
+      setIsDataLoading(true);
 
       // Request the worker to make the changes
       workerRef.current.postMessage({
