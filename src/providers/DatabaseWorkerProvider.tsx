@@ -6,6 +6,7 @@ import {
   useCallback,
   useState
 } from "react";
+import useKeyPress from "@/hooks/useKeyPress";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
 import { usePanelManager } from "./PanelProvider";
@@ -443,13 +444,31 @@ export const DatabaseWorkerProvider = ({
       if (typeof type === "number") {
         setOffset(type);
       } else if (type === "next") {
-        setOffset(currentOffset + limit);
+        const toSet = currentOffset + limit;
+        if (toSet >= maxSize) {
+          if (maxSize - limit < 0) {
+            setOffset(0);
+          } else {
+            setOffset(maxSize - limit);
+          }
+        } else {
+          setOffset(toSet);
+        }
       } else if (type === "prev") {
-        setOffset(currentOffset - limit);
+        const toSet = currentOffset - limit;
+        if (toSet < 0) {
+          setOffset(0);
+        } else {
+          setOffset(toSet);
+        }
       } else if (type === "first") {
         setOffset(0);
       } else if (type === "last") {
-        setOffset(maxSize - limit);
+        if (maxSize - limit < 0) {
+          setOffset(0);
+        } else {
+          setOffset(maxSize - limit);
+        }
       }
 
       setSelectedRowObject(null);
@@ -537,6 +556,15 @@ export const DatabaseWorkerProvider = ({
 
       setIsDataLoading(true);
 
+      if (!selectedRowObject?.primaryValue) {
+        if (type === "delete") {
+          toast.error("No row selected to delete");
+        } else {
+          toast.error(`No values provided to ${type}`);
+        }
+        return;
+      }
+
       // Request the worker to make the changes
       workerRef.current.postMessage({
         action: type,
@@ -570,6 +598,20 @@ export const DatabaseWorkerProvider = ({
       selectedRowObject
     ]
   );
+
+  // Register hotkeys
+  useKeyPress("ctrl+s", () => handleDownload());
+
+  useKeyPress("ctrl+I", () => handleEditSubmit("insert"), true);
+  useKeyPress("ctrl+u", () => handleEditSubmit("update"));
+  useKeyPress("ctrl+d", () => handleEditSubmit("delete"));
+
+  useKeyPress("ctrl+q", () => handleQueryExecute());
+
+  useKeyPress("ctrl+ArrowRight", () => handlePageChange("next"));
+  useKeyPress("ctrl+ArrowUp", () => handlePageChange("first"));
+  useKeyPress("ctrl+ArrowDown", () => handlePageChange("last"));
+  useKeyPress("ctrl+ArrowLeft", () => handlePageChange("prev"));
 
   const value = {
     workerRef,

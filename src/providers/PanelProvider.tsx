@@ -1,4 +1,5 @@
 import { createContext, useContext, useCallback, useState } from "react";
+import useKeyPress from "@/hooks/useKeyPress";
 
 import type { SqlValue } from "sql.js";
 
@@ -60,6 +61,10 @@ export const PanelProvider = ({ children }: PanelProviderProps) => {
     setIsInserting(false);
     setSelectedRowObject(null);
   }, []);
+
+  // Register hotkeys
+  useKeyPress("ctrl+i", () => handleInsert(), true);
+  useKeyPress("ctrl+`", () => handleCloseEdit(), true);
 
   const value = {
     handleRowClick,
