@@ -135,15 +135,14 @@ export const DatabaseWorkerProvider = ({
         const results = payload.results;
         if (!results) {
           setData(null);
-          return;
-        }
-
-        const data = results[0]?.values || [];
-        // To be able to cache the columns
-        if (data.length !== 0) {
-          setData(data);
         } else {
-          setData(null);
+          const data = results[0]?.values || [];
+          // To be able to cache the columns
+          if (data.length !== 0) {
+            setData(data);
+          } else {
+            setData(null);
+          }
         }
 
         setIsDataLoading(false);
@@ -155,17 +154,16 @@ export const DatabaseWorkerProvider = ({
         const results = payload.results;
         if (!results) {
           setData(null);
-          return;
-        }
-
-        const data = results[0]?.values || [];
-        if (data.length !== 0) {
-          setCustomQueryObject({
-            data: data,
-            columns: results[0]?.columns || []
-          });
         } else {
-          setCustomQueryObject(null);
+          const data = results[0]?.values || [];
+          if (data.length !== 0) {
+            setCustomQueryObject({
+              data: data,
+              columns: results[0]?.columns || []
+            });
+          } else {
+            setCustomQueryObject(null);
+          }
         }
 
         setIsDataLoading(false);
