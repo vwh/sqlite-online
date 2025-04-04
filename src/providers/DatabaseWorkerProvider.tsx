@@ -30,6 +30,7 @@ import type {
 
 interface DatabaseWorkerContextProps {
   workerRef: React.MutableRefObject<Worker | null>;
+  handleFileUpload: (file: File) => void;
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDownload: () => void;
   handleTableChange: (selectedTable: string) => void;
@@ -59,6 +60,10 @@ export const DatabaseWorkerProvider = ({
   const setIndexesSchema = useDatabaseStore((state) => state.setIndexesSchema);
   const setCurrentTable = useDatabaseStore((state) => state.setCurrentTable);
   const setData = useDatabaseStore((state) => state.setData);
+  const setCustomQuery = useDatabaseStore((state) => state.setCustomQuery);
+  const customQueryObject = useDatabaseStore(
+    (state) => state.customQueryObject
+  );
   const setColumns = useDatabaseStore((state) => state.setColumns);
   const setMaxSize = useDatabaseStore((state) => state.setMaxSize);
   const setIsDatabaseLoading = useDatabaseStore(
@@ -123,6 +128,8 @@ export const DatabaseWorkerProvider = ({
         setSorters(null);
         setSelectedRowObject(null);
         setIsInserting(false);
+        setCustomQueryObject(null);
+        setCustomQuery("");
         setOffset(0);
         setIsDatabaseLoading(false);
       }
@@ -338,6 +345,28 @@ export const DatabaseWorkerProvider = ({
     setIsDataLoading
   ]);
 
+  // Handle file upload
+  const handleFileUpload = useCallback((file: File) => {
+    toast.info("Opening database");
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const arrayBuffer = e.target?.result as ArrayBuffer;
+
+      if (!workerRef.current) {
+        toast.error("Worker is not initialized");
+        return;
+      }
+
+      // Send the file to the worker to initialize the database
+      workerRef.current.postMessage({
+        action: "openFile",
+        payload: { file: arrayBuffer }
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  }, []);
+
   // Handle file upload by sending the file to the worker
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,26 +376,9 @@ export const DatabaseWorkerProvider = ({
         return;
       }
 
-      toast.info("Opening database");
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const arrayBuffer = e.target?.result as ArrayBuffer;
-
-        if (!workerRef.current) {
-          toast.error("Worker is not initialized");
-          return;
-        }
-
-        // Send the file to the worker to initialize the database
-        workerRef.current.postMessage({
-          action: "openFile",
-          payload: { file: arrayBuffer }
-        });
-      };
-      reader.readAsArrayBuffer(file);
+      handleFileUpload(file);
     },
-    []
+    [handleFileUpload]
   );
 
   // Handle when user downloads the database
@@ -611,6 +623,7 @@ export const DatabaseWorkerProvider = ({
 
   const value = {
     workerRef,
+    handleFileUpload,
     handleFileChange,
     handleDownload,
     handleTableChange,
