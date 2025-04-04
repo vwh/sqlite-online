@@ -61,9 +61,6 @@ export const DatabaseWorkerProvider = ({
   const setCurrentTable = useDatabaseStore((state) => state.setCurrentTable);
   const setData = useDatabaseStore((state) => state.setData);
   const setCustomQuery = useDatabaseStore((state) => state.setCustomQuery);
-  const customQueryObject = useDatabaseStore(
-    (state) => state.customQueryObject
-  );
   const setColumns = useDatabaseStore((state) => state.setColumns);
   const setMaxSize = useDatabaseStore((state) => state.setMaxSize);
   const setIsDatabaseLoading = useDatabaseStore(
