@@ -446,8 +446,6 @@ export const DatabaseWorkerProvider = ({
         if (toSet >= maxSize) {
           if (maxSize - limit < 0) {
             setOffset(0);
-          } else {
-            setOffset(maxSize - limit);
           }
         } else {
           setOffset(toSet);
