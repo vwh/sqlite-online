@@ -33,7 +33,9 @@ const TableColumn = memo(
           </span>
         </div>
         <Span className="text-primary/60 text-xs whitespace-nowrap">
-          {columnSchema.type}
+          <span className="text-primary/50 bg-primary/5 rounded-full px-2 py-0.5 text-xs">
+            {columnSchema.type}
+          </span>
         </Span>
       </div>
     );
@@ -221,7 +223,9 @@ const IndexItem = memo(({ index }: { index: IndexSchema }) => {
         <div className="flex w-full items-center justify-between gap-1">
           <span className="text-sm">{index.name}</span>
           <Span className="text-primary/60 text-xs font-medium whitespace-nowrap">
-            {index.tableName}
+            <span className="text-primary/50 bg-primary/5 rounded-full px-2 py-0.5 text-xs">
+              {index.tableName}
+            </span>
           </Span>
         </div>
       </div>

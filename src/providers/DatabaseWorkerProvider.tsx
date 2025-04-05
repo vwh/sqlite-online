@@ -304,10 +304,10 @@ export const DatabaseWorkerProvider = ({
       if (isFirstTimeLoading) {
         setIsFirstTimeLoading(false);
         if (dataSectionHight && paginationControlsHight) {
-          // 51.5 is hight of tableHeader and 33 is hight of tableRow
+          // 47.5 is hight of tableHeader and 33 is hight of tableRow
           // They are hardcoded because they not loaded yet
           limit = Math.floor(
-            (dataSectionHight - paginationControlsHight - 51.5) / 33
+            (dataSectionHight - paginationControlsHight - 47.5) / 33
           );
         }
       } else {
@@ -560,7 +560,7 @@ export const DatabaseWorkerProvider = ({
         return;
       }
 
-      if (!selectedRowObject?.primaryValue) {
+      if (!selectedRowObject?.primaryValue && type !== "insert") {
         if (type === "delete") {
           toast.error("No row selected to delete");
         } else {

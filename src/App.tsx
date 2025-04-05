@@ -6,8 +6,14 @@ import StructureTab from "@/components/structureTab/StructureTab";
 import BrowseTab from "@/components/browseTab/BrowseTab";
 import ExecuteTab from "@/components/executeTab/ExecuteTab";
 
-import { LoaderCircleIcon } from "lucide-react";
 import FileDropHandler from "./components/FileDropHandler";
+
+import {
+  CodeIcon,
+  DatabaseIcon,
+  LoaderCircleIcon,
+  TableIcon
+} from "lucide-react";
 
 export default function App() {
   const isDatabaseLoading = useDatabaseStore(
@@ -27,6 +33,7 @@ export default function App() {
               value="structure"
               className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
             >
+              <DatabaseIcon className="hidden h-4 w-4 md:block" />
               Database Structure
             </TabsTrigger>
             <TabsTrigger
@@ -36,7 +43,8 @@ export default function App() {
               value="data"
               className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
             >
-              Browse Data
+              <TableIcon className="hidden h-4 w-4 md:block" />
+              <span>Browse Data</span>
             </TabsTrigger>
             <TabsTrigger
               disabled={isDatabaseLoading}
@@ -45,6 +53,7 @@ export default function App() {
               value="execute"
               className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
             >
+              <CodeIcon className="hidden h-4 w-4 md:block" />
               Execute SQL
             </TabsTrigger>
           </TabsList>
@@ -77,8 +86,15 @@ export default function App() {
 }
 
 const LoadingIndicator = ({ message }: { message: string }) => (
-  <div className="flex h-full items-center justify-center">
-    <LoaderCircleIcon className="mr-2 h-4 w-4 animate-spin" />
-    <span className="text-xl">{message}</span>
+  <div className="flex h-full flex-col items-center justify-center gap-4">
+    <div className="bg-primary/10 rounded-full p-4">
+      <LoaderCircleIcon className="text-primary h-8 w-8 animate-spin" />
+    </div>
+    <div className="flex flex-col items-center">
+      <span className="text-xl font-medium">{message}</span>
+      <span className="text-muted-foreground text-sm">
+        Please wait while the database is initializing
+      </span>
+    </div>
   </div>
 );

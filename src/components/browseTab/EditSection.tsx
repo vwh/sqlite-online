@@ -55,73 +55,77 @@ const EditSection = () => {
     const schema = tablesSchema[currentTable]?.schema;
 
     return columns.map((column, index) => (
-      <div key={column}>
+      <div key={column} className="border-primary/10 border shadow-sm">
         <label
           htmlFor={column}
-          className="bg-primary/5 flex items-center gap-1 rounded-sm p-2"
+          className="bg-primary/5 border-primary/10 flex items-center gap-1 border-b p-1.5"
         >
           <div className="flex w-full items-center justify-between gap-2">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <ColumnIcon columnSchema={schema[index]} />
               <Span className="text-xs font-medium capitalize">{column}</Span>
             </div>
-            <span className="text-primary/50 text-xs">
-              {schema[index].IsNullable && "Nullable"}
-            </span>
+            {schema[index].IsNullable && (
+              <span className="text-primary/50 bg-primary/5 rounded-full px-2 py-0.5 text-xs">
+                Nullable
+              </span>
+            )}
           </div>
         </label>
-        {isText(schema[index]?.type || "") ? (
-          <Textarea
-            id={column}
-            name={column}
-            className="border-primary/20 rounded-none text-sm text-[0.8rem]!"
-            value={editValues[index] || ""}
-            onChange={(e) => handleEditInputChange(index, e.target.value)}
-            placeholder={
-              tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
-            }
-          />
-        ) : (
-          <Input
-            id={column}
-            name={column}
-            type={
-              isNumber(schema[index]?.type || "")
-                ? "number"
-                : isDate(schema[index]?.type || "")
-                  ? "date"
-                  : "text"
-            }
-            className="border-primary/20 h-8 rounded-none text-sm text-[0.8rem]!"
-            value={editValues[index] || ""}
-            onChange={(e) => handleEditInputChange(index, e.target.value)}
-            placeholder={
-              tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
-            }
-          />
-        )}
+        <div className="p-1">
+          {isText(schema[index]?.type || "") ? (
+            <Textarea
+              id={column}
+              name={column}
+              className="border-primary/20 focus:ring-primary/30 focus:border-primary/40 rounded border text-sm text-[0.8rem]! focus:ring-1"
+              value={editValues[index] || ""}
+              onChange={(e) => handleEditInputChange(index, e.target.value)}
+              placeholder={
+                tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
+              }
+            />
+          ) : (
+            <Input
+              id={column}
+              name={column}
+              type={
+                isNumber(schema[index]?.type || "")
+                  ? "number"
+                  : isDate(schema[index]?.type || "")
+                    ? "date"
+                    : "text"
+              }
+              className="border-primary/20 focus:ring-primary/30 focus:border-primary/40 h-9 rounded border text-[0.8rem]! focus:ring-1"
+              value={editValues[index] || ""}
+              onChange={(e) => handleEditInputChange(index, e.target.value)}
+              placeholder={
+                tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
+              }
+            />
+          )}
+        </div>
       </div>
     ));
   }, [columns, currentTable, tablesSchema, editValues, handleEditInputChange]);
 
   const actionButtons = useMemo(
     () => (
-      <div className="flex w-full">
+      <div className="bg-primary/5 border-primary/10 flex w-full gap-1 border-t p-2 shadow-inner">
         <Button
           size="sm"
           variant="outline"
-          className="w-full text-xs"
+          className="w-full py-2 text-xs font-medium"
           onClick={() => handleEditSubmit(isInserting ? "insert" : "update")}
           aria-label={isInserting ? "Insert row" : "Apply changes"}
         >
           {isInserting ? (
             <>
-              <PlusIcon className="mr-1 h-3 w-3" />
+              <PlusIcon className="mr-2 h-3.5 w-3.5" />
               Insert row
             </>
           ) : (
             <>
-              <SquarePenIcon className="mr-1 h-3 w-3" />
+              <SquarePenIcon className="mr-2 h-3.5 w-3.5" />
               Apply changes
             </>
           )}
@@ -130,11 +134,11 @@ const EditSection = () => {
           <Button
             size="sm"
             variant="destructive"
-            className="rounded-none text-xs"
+            className="hover:bg-destructive/50 rounded text-xs"
             onClick={() => handleEditSubmit("delete")}
             aria-label="Delete row"
           >
-            <Trash2Icon className="h-2 w-2" />
+            <Trash2Icon className="h-3.5 w-3.5" />
           </Button>
         )}
       </div>
@@ -144,17 +148,25 @@ const EditSection = () => {
 
   const sectionHeader = useMemo(
     () => (
-      <div className="bg-primary/5 flex w-full items-center justify-between gap-1 border-b p-2 text-sm">
-        <div className="flex items-center gap-1">
+      <div className="bg-primary/5 sticky top-0 z-10 flex w-full items-center justify-between gap-1 border-b p-2 shadow-sm">
+        <div className="flex items-center gap-2">
           {isInserting ? (
             <>
-              <PlusIcon className="h-4 w-4" />
-              <Span className="whitespace-nowrap">Inserting row</Span>
+              <div className="bg-primary/10 rounded p-1.5">
+                <PlusIcon className="h-4 w-4" />
+              </div>
+              <Span className="text-sm font-medium whitespace-nowrap">
+                Inserting new row
+              </Span>
             </>
           ) : (
             <>
-              <SquarePenIcon className="h-4 w-4" />
-              <Span className="whitespace-nowrap">Updating row</Span>
+              <div className="bg-primary/10 rounded p-1.5">
+                <SquarePenIcon className="h-4 w-4" />
+              </div>
+              <Span className="text-sm font-medium whitespace-nowrap">
+                Updating row
+              </Span>
             </>
           )}
         </div>
@@ -166,7 +178,8 @@ const EditSection = () => {
           title="Go back to data"
           aria-label="Go back to data"
         >
-          <ChevronLeftIcon className="h-3 w-3" />
+          <ChevronLeftIcon className="mr-1 h-3 w-3" />
+          Back
         </Button>
       </div>
     ),
@@ -174,14 +187,10 @@ const EditSection = () => {
   );
 
   return (
-    <section className="h-full overflow-auto">
-      <div className="flex h-full w-full flex-col">
-        <div className="overflow-auto">
-          {sectionHeader}
-          {formItems}
-        </div>
-        {actionButtons}
-      </div>
+    <section className="flex h-full flex-col">
+      {sectionHeader}
+      <div className="flex-1 overflow-auto">{formItems}</div>
+      {actionButtons}
     </section>
   );
 };

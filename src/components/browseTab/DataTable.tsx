@@ -16,7 +16,7 @@ import { Span } from "@/components/ui/span";
 import ColumnIcon from "@/components/table/ColumnIcon";
 import FilterInput from "@/components/table/FilterInput";
 
-import { FilterXIcon } from "lucide-react";
+import { DatabaseIcon, FilterXIcon } from "lucide-react";
 import SorterButton from "../table/SorterButton";
 
 const DataTable = () => {
@@ -35,9 +35,12 @@ const DataTable = () => {
       <div className="flex h-full flex-col items-center justify-center gap-1 px-4">
         {filters ? (
           <>
-            <p className="text-md font-medium">
-              No Data To Show For Current Filters
-            </p>
+            <div className="text-center">
+              <h3 className="mb-1 font-medium">No Data To Show</h3>
+              <p className="text-muted-foreground max-w-md text-sm">
+                The current filters did not return any results
+              </p>
+            </div>
             <Button
               size="sm"
               variant="outline"
@@ -49,12 +52,17 @@ const DataTable = () => {
             </Button>
           </>
         ) : (
-          <>
-            <p className="text-md font-medium">No Data To Show</p>
-            <p className="text-sm">
-              This table does not have any data to display
-            </p>
-          </>
+          <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
+            <div className="bg-primary/10 rounded-full p-4">
+              <DatabaseIcon className="text-primary/70 h-8 w-8" />
+            </div>
+            <div className="text-center">
+              <h3 className="mb-1 font-medium">No Data To Show</h3>
+              <p className="text-muted-foreground max-w-md text-sm">
+                This table does not have any data to display
+              </p>
+            </div>
+          </div>
         )}
       </div>
     ),
@@ -109,20 +117,20 @@ const DataTable = () => {
                 className="hover:bg-primary/5 focus:bg-primary/5 cursor-pointer text-xs"
               >
                 {displayData.map((value, j) => (
-                  <TableCell key={j} className="p-2">
+                  <TableCell key={j} className="border-primary/5 border-t p-2">
                     {value ? (
                       <>
                         {tablesSchema[currentTable!].schema[j]?.type ===
                         "BLOB" ? (
-                          <span className="text-muted-foreground italic">
+                          <span className="text-muted-foreground bg-primary/5 rounded px-2 py-0.5 text-xs italic">
                             BLOB
                           </span>
                         ) : (
-                          <Span>{value}</Span>
+                          <Span className="text-xs">{value}</Span>
                         )}
                       </>
                     ) : (
-                      <span className="text-muted-foreground italic">
+                      <span className="text-muted-foreground bg-primary/5 rounded px-2 py-0.5 text-xs italic">
                         {value === null ? "NULL" : JSON.stringify(value)}
                       </span>
                     )}

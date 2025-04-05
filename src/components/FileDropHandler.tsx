@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
 
 import { toast } from "sonner";
 
-import { Upload } from "lucide-react";
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
+import { DatabaseIcon } from "lucide-react";
 
 interface FileDropHandlerProps {
   children: React.ReactNode;
@@ -70,10 +70,16 @@ function FileDropHandler({ children }: FileDropHandlerProps) {
     <>
       {children}
       {isDragging && (
-        <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="border-primary bg-background flex h-64 w-96 flex-col items-center justify-center rounded border-2 border-dashed p-6">
-            <Upload className="text-primary mb-4 h-12 w-12" />
-            <h3 className="text-xl font-medium">Drop Database Here</h3>
+        <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-all">
+          <div className="border-primary/60 bg-background/95 animate-in fade-in zoom-in-95 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 shadow-lg transition-transform duration-200">
+            <div className="bg-primary/10 mb-6 flex items-center justify-center rounded-full p-5">
+              <DatabaseIcon className="text-primary h-12 w-12" />
+            </div>
+
+            <h3 className="mb-2 text-xl font-medium">Drop SQLite Database</h3>
+            <p className="text-muted-foreground mb-4 text-center text-sm">
+              Release to load your database file
+            </p>
           </div>
         </section>
       )}

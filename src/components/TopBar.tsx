@@ -10,49 +10,72 @@ const TopBar = () => {
   const { handleFileChange, handleDownload } = useDatabaseWorker();
 
   return (
-    <header className="flex items-center justify-between gap-1 border-b p-1">
-      <section className="flex w-full items-center gap-1">
-        <label
-          htmlFor="file-upload"
-          className="relative w-full cursor-pointer md:w-[300px]"
+    <header className="flex items-center justify-between gap-2 border-b px-2 py-1.5 shadow-sm">
+      <div className="flex items-center">
+        <a
+          href="https://github.com/vwh/sqlite-online"
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          <Input
-            id="file-upload"
-            type="file"
-            className="absolute inset-0 cursor-pointer opacity-0"
-            onChange={handleFileChange}
+          <img
+            src="/logo.webp"
+            alt="Logo"
+            className="h-6 w-6"
+            aria-hidden="true"
           />
-          <Button size="sm" variant="outline" className="w-full text-xs">
-            <DatabaseIcon className="h-3 w-3" />
-            Open Database
+        </a>
+      </div>
+
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center gap-1">
+          <label htmlFor="file-upload" className="relative cursor-pointer">
+            <Input
+              id="file-upload"
+              type="file"
+              className="absolute inset-0 cursor-pointer opacity-0"
+              onChange={handleFileChange}
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 px-3 text-xs font-medium shadow-sm sm:w-[200px]"
+            >
+              <DatabaseIcon className="mr-1.5 h-3.5 w-3.5" />
+              Open Database
+            </Button>
+          </label>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 px-3 text-xs font-medium shadow-sm"
+            onClick={handleDownload}
+            title="Save the database"
+          >
+            <SaveIcon className="mr-1.5 h-3.5 w-3.5" />
+            Save Database
           </Button>
-        </label>
-        <Button
-          size="sm"
-          variant="outline"
-          className="text-xs"
-          onClick={handleDownload}
-          title="Save the database"
-        >
-          <SaveIcon className="h-3 w-3" />
-          Save Database
-        </Button>
-      </section>
-      <a
-        href="https://github.com/vwh/sqlite-online"
-        target="_blank"
-        rel="noreferrer"
-      >
-        <Button
-          size="sm"
-          variant="outline"
-          className="text-xs"
-          title="Source Code"
-        >
-          <GithubIcon className="h-3 w-3" />
-        </Button>
-      </a>
-      <ModeToggle />
+        </div>
+
+        <div className="flex items-center gap-1">
+          <a
+            href="https://github.com/vwh/sqlite-online"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-opacity hover:opacity-80"
+          >
+            <Button
+              size="icon"
+              variant="ghost"
+              className="hidden h-8 w-8 sm:flex"
+              title="View Source Code on GitHub"
+            >
+              <GithubIcon className="h-4 w-4" />
+            </Button>
+          </a>
+
+          <ModeToggle />
+        </div>
+      </div>
     </header>
   );
 };
