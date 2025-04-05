@@ -11,7 +11,7 @@ import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
 import { usePanelManager } from "./PanelProvider";
 
-import { toast } from "sonner";
+import { toastError, toastInfo, toastSuccess } from "@/components/Toaster";
 
 import type {
   CustomQueryCompleteResponse,
@@ -182,7 +182,7 @@ export const DatabaseWorkerProvider = ({
         setIsDataLoading(false);
         setErrorMessage(null);
 
-        toast.success("Database schema updated successfully");
+        toastSuccess("Database schema updated successfully");
       }
       // When a row is updated
       else if (action === "updateComplete") {
@@ -191,14 +191,14 @@ export const DatabaseWorkerProvider = ({
         setErrorMessage(null);
         handleCloseEdit();
 
-        toast.success(`Row ${payload.type} successfully`);
+        toastSuccess(`Row ${payload.type} successfully`);
       }
       // When a row is inserted
       else if (action === "insertComplete") {
         setErrorMessage(null);
         handleCloseEdit();
 
-        toast.success("Row inserted successfully");
+        toastSuccess("Row inserted successfully");
       }
       // When the database is downloaded
       else if (action === "downloadComplete") {
@@ -213,7 +213,7 @@ export const DatabaseWorkerProvider = ({
         link.download = "database.sqlite";
         link.click();
 
-        toast.success("Database downloaded successfully");
+        toastSuccess("Database downloaded successfully");
       }
       // When the database is exported
       else if (action === "exportComplete") {
@@ -228,7 +228,7 @@ export const DatabaseWorkerProvider = ({
         link.download = "export.csv";
         link.click();
 
-        toast.success("Database exported successfully");
+        toastSuccess("Database exported successfully");
       }
       // When the worker encounters an error
       else if (action === "queryError") {
@@ -240,9 +240,9 @@ export const DatabaseWorkerProvider = ({
 
         if (payload.error.isCustomQueryError) {
           setErrorMessage(payload.error.message);
-          toast.error(payload.error.message);
+          toastError(payload.error.message);
         } else {
-          toast.error(payload.error.message);
+          toastError(payload.error.message);
         }
       } else {
         console.warn("Unknown action:", action);
@@ -281,7 +281,7 @@ export const DatabaseWorkerProvider = ({
     if (!currentTable) return;
     const handler = setTimeout(() => {
       if (!workerRef.current) {
-        toast.error("Worker is not initialized");
+        toastError("Worker is not initialized");
         return;
       }
 
@@ -344,14 +344,14 @@ export const DatabaseWorkerProvider = ({
 
   // Handle file upload
   const handleFileUpload = useCallback((file: File) => {
-    toast.info("Opening database");
+    toastInfo("Opening database");
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const arrayBuffer = e.target?.result as ArrayBuffer;
 
       if (!workerRef.current) {
-        toast.error("Worker is not initialized");
+        toastError("Worker is not initialized");
         return;
       }
 
@@ -369,7 +369,7 @@ export const DatabaseWorkerProvider = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file) {
-        toast.error("No file selected");
+        toastError("No file selected");
         return;
       }
 
@@ -381,7 +381,7 @@ export const DatabaseWorkerProvider = ({
   // Handle when user downloads the database
   const handleDownload = useCallback(() => {
     if (!workerRef.current) {
-      toast.error("Worker is not initialized");
+      toastError("Worker is not initialized");
       return;
     }
 
@@ -485,7 +485,7 @@ export const DatabaseWorkerProvider = ({
   const handleExport = useCallback(
     (exportType: exportTypes) => {
       if (!workerRef.current) {
-        toast.error("Worker is not initialized");
+        toastError("Worker is not initialized");
         return;
       }
 
@@ -509,7 +509,7 @@ export const DatabaseWorkerProvider = ({
   // Handle SQL statement execution by sending it to the worker
   const handleQueryExecute = useCallback(() => {
     if (!workerRef.current) {
-      toast.error("Worker is not initialized");
+      toastError("Worker is not initialized");
       return;
     }
 
@@ -556,15 +556,15 @@ export const DatabaseWorkerProvider = ({
   const handleEditSubmit = useCallback(
     (type: EditTypes) => {
       if (!workerRef.current) {
-        toast.error("Worker is not initialized");
+        toastError("Worker is not initialized");
         return;
       }
 
       if (!selectedRowObject?.primaryValue && type !== "insert") {
         if (type === "delete") {
-          toast.error("No row selected to delete");
+          toastError("No row selected to delete");
         } else {
-          toast.error(`No values provided to ${type}`);
+          toastError(`No values provided to ${type}`);
         }
         return;
       }
