@@ -11,7 +11,7 @@ const TopBar = () => {
 
   return (
     <header className="flex items-center justify-between gap-2 border-b px-2 py-1.5 shadow-sm">
-      <div className="flex items-center">
+      {/* <div className="flex items-center">
         <a
           href="https://github.com/vwh/sqlite-online"
           target="_blank"
@@ -24,7 +24,7 @@ const TopBar = () => {
             aria-hidden="true"
           />
         </a>
-      </div>
+      </div> */}
 
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-1">

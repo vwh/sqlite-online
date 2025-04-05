@@ -25,7 +25,7 @@ export default function App() {
       <main className="bg-primary/5 flex h-screen flex-col overflow-hidden">
         <TopBar />
         <Tabs defaultValue="data" className="flex flex-1 flex-col">
-          <TabsList className="bg-primary/5 mt-2 h-9 w-full justify-start rounded-none border-b">
+          <TabsList className="bg-primary/5 h-9 w-full justify-start rounded-none border-b">
             <TabsTrigger
               id="structure"
               key="structure"
