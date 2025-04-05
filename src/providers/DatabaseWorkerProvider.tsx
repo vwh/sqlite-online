@@ -498,11 +498,12 @@ export const DatabaseWorkerProvider = ({
           limit,
           filters,
           sorters,
+          customQuery,
           exportType: exportType
         }
       });
     },
-    [currentTable, filters, sorters, offset, limit]
+    [currentTable, filters, sorters, offset, limit, customQuery]
   );
 
   // Handle SQL statement execution by sending it to the worker

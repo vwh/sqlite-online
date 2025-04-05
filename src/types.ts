@@ -26,7 +26,7 @@ export type Sorters = Record<string, "asc" | "desc">;
 export type Filters = Record<string, string>;
 
 export type EditTypes = "insert" | "update" | "delete";
-export type exportTypes = "table" | "current";
+export type exportTypes = "table" | "current" | "custom";
 
 // --- WORKER MESSAGES --- //
 export interface InitEvent {
@@ -115,6 +115,7 @@ export interface ExportEvent {
     sorters: Sorters;
     limit: number;
     offset: number;
+    customQuery: string;
     exportType: exportTypes;
   };
 }

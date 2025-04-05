@@ -1,4 +1,5 @@
-import Sqlite, { CustomQueryError } from "./sqlite";
+import { QueryExecResult } from "sql.js";
+import Sqlite, { CustomQueryError, arrayToCSV } from "./sqlite";
 
 import type {
   DeleteEvent,
@@ -225,26 +226,33 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       // It have 2 types of exports (table, current data)
       // Current data is the current page of data
       case "export": {
-        const { table, filters, sorters, limit, offset, exportType } =
-          payload as ExportEvent["payload"];
+        const {
+          table,
+          filters,
+          sorters,
+          limit,
+          offset,
+          exportType,
+          customQuery
+        } = payload as ExportEvent["payload"];
 
-        let results: string;
+        let results: QueryExecResult[];
         if (exportType === "table") {
-          results = instance.getTableAsCsv(table);
+          results = instance.export({ table });
+        } else if (exportType === "current") {
+          results = instance.export({ table, limit, offset, filters, sorters });
+        } else if (exportType === "custom") {
+          results = instance.export({ customQuery });
         } else {
-          results = instance.getCurrentDataAsCsv(
-            table,
-            limit,
-            offset,
-            filters,
-            sorters
-          );
+          throw new Error("Unknown export type");
         }
+
+        const csvResults = arrayToCSV(results[0].columns, results[0].values);
 
         // Send the export response to the main thread
         self.postMessage({
           action: "exportComplete",
-          payload: { results }
+          payload: { results: csvResults }
         });
 
         break;

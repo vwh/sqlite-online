@@ -277,43 +277,30 @@ export default class Sqlite {
   }
 
   // Used for exporting data as CSV
-  private export({
+  public export({
     table,
     offset,
     limit,
     filters,
-    sorters
+    sorters,
+    customQuery
   }: {
-    table: string;
+    table?: string;
     offset?: number;
     limit?: number;
     filters?: Filters;
     sorters?: Sorters;
+    customQuery?: string;
   }) {
-    let query = `SELECT * FROM "${table}" ${buildWhereClause(
-      filters
-    )} ${buildOrderByClause(sorters)}`;
-    if (offset && limit) query += ` LIMIT ${limit} OFFSET ${offset}`;
+    let query = customQuery;
+    if (!query) {
+      query = `SELECT * FROM "${table}" ${buildWhereClause(
+        filters
+      )} ${buildOrderByClause(sorters)}`;
+      if (offset && limit) query += ` LIMIT ${limit} OFFSET ${offset}`;
+    }
     const [results] = this.exec(query);
     return results;
-  }
-
-  // Used for exporting a selected table as CSV
-  public getTableAsCsv(table: string) {
-    const results = this.export({ table });
-    return arrayToCSV(results[0].columns, results[0].values);
-  }
-
-  // Used for exporting the current page of data as CSV
-  public getCurrentDataAsCsv(
-    table: string,
-    limit: number,
-    offset: number,
-    filters: Filters,
-    sorters: Sorters
-  ) {
-    const results = this.export({ table, filters, sorters, limit, offset });
-    return arrayToCSV(results[0].columns, results[0].values);
   }
 }
 
@@ -344,7 +331,7 @@ function buildOrderByClause(sorters?: Sorters) {
 }
 
 // Convert an array of objects to a CSV string
-function arrayToCSV(columns: string[], rows: SqlValue[][]) {
+export function arrayToCSV(columns: string[], rows: SqlValue[][]) {
   const header = columns.map((col) => `"${col}"`).join(",");
   const csvRows = rows.map((row) =>
     columns.map((col) => `"${row[columns.indexOf(col)]}"`).join(",")

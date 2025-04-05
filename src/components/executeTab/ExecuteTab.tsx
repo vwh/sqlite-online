@@ -14,7 +14,12 @@ import CustomSQLTextarea from "./CustomSQLTextarea";
 import SchemaTree from "@/components/structureTab/SchemaTree";
 import CustomQueryDataTable from "./CustomQueryDataTable";
 
-import { PlayIcon, LoaderCircleIcon, XIcon } from "lucide-react";
+import {
+  PlayIcon,
+  LoaderCircleIcon,
+  XIcon,
+  FolderOutputIcon
+} from "lucide-react";
 
 const ExecuteTab = () => {
   const errorMessage = useDatabaseStore((state) => state.errorMessage);
@@ -28,8 +33,11 @@ const ExecuteTab = () => {
   const schemaPanelSize = usePanelStore((state) => state.schemaPanelSize);
   const setDataPanelSize = usePanelStore((state) => state.setDataPanelSize);
   const setSchemaPanelSize = usePanelStore((state) => state.setSchemaPanelSize);
+  const customQueryObject = useDatabaseStore(
+    (state) => state.customQueryObject
+  );
 
-  const { handleQueryExecute } = useDatabaseWorker();
+  const { handleQueryExecute, handleExport } = useDatabaseWorker();
 
   const handleErrorClose = useCallback(() => {
     setErrorMessage(null);
@@ -48,8 +56,9 @@ const ExecuteTab = () => {
           <PlayIcon className="mr-1 h-3 w-3" />
           Execute SQL
         </Button>
-        {/* TODO: Export data */}
-        {/* <Button
+
+        <Button
+          onClick={() => handleExport("custom")}
           size="sm"
           variant="outline"
           className="text-xs"
@@ -57,7 +66,7 @@ const ExecuteTab = () => {
         >
           <FolderOutputIcon className="mr-1 h-3 w-3" />
           Export data
-        </Button> */}
+        </Button>
         {(isDataLoading || isDatabaseLoading) && (
           <span className="ml-2 flex items-center text-xs text-gray-500">
             <LoaderCircleIcon className="mr-1 h-3 w-3 animate-spin" />
