@@ -10,7 +10,7 @@ const TopBar = () => {
   const { handleFileChange, handleDownload } = useDatabaseWorker();
 
   return (
-    <header className="flex items-center justify-between gap-2 border-b px-2 py-1.5 shadow-sm">
+    <header className="flex items-center justify-between gap-2 border-b px-2 py-1.5">
       {/* <div className="flex items-center">
         <a
           href="https://github.com/vwh/sqlite-online"
@@ -28,17 +28,17 @@ const TopBar = () => {
 
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-1">
-          <label htmlFor="file-upload" className="relative cursor-pointer">
+          <label htmlFor="file-upload" className="relative">
             <Input
               id="file-upload"
               type="file"
-              className="absolute inset-0 cursor-pointer opacity-0"
+              className="pointer-events-none absolute inset-0 opacity-0"
               onChange={handleFileChange}
             />
             <Button
               size="sm"
               variant="outline"
-              className="h-8 px-3 text-xs font-medium shadow-sm sm:w-[200px]"
+              className="border-foreground/25 h-8 cursor-pointer px-3 text-xs font-medium sm:w-[200px]"
             >
               <DatabaseIcon className="mr-1.5 h-3.5 w-3.5" />
               Open Database
@@ -47,7 +47,7 @@ const TopBar = () => {
           <Button
             size="sm"
             variant="outline"
-            className="h-8 px-3 text-xs font-medium shadow-sm"
+            className="border-foreground/25 h-8 cursor-pointer px-3 text-xs font-medium"
             onClick={handleDownload}
             title="Save the database"
           >

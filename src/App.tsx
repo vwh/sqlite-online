@@ -27,16 +27,6 @@ export default function App() {
         <Tabs defaultValue="data" className="flex flex-1 flex-col">
           <TabsList className="bg-primary/5 h-9 w-full justify-start rounded-none border-b">
             <TabsTrigger
-              id="structure"
-              key="structure"
-              disabled={isDatabaseLoading}
-              value="structure"
-              className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
-            >
-              <DatabaseIcon className="hidden h-4 w-4 md:block" />
-              Database Structure
-            </TabsTrigger>
-            <TabsTrigger
               id="data"
               key="data"
               disabled={isDatabaseLoading}
@@ -55,6 +45,16 @@ export default function App() {
             >
               <CodeIcon className="hidden h-4 w-4 md:block" />
               Execute SQL
+            </TabsTrigger>
+            <TabsTrigger
+              id="structure"
+              key="structure"
+              disabled={isDatabaseLoading}
+              value="structure"
+              className="data-[state=active]: data-[state=active]:border-primary h-8 rounded-none text-xs"
+            >
+              <DatabaseIcon className="hidden h-4 w-4 md:block" />
+              Database Structure
             </TabsTrigger>
           </TabsList>
 
