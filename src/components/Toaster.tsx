@@ -113,7 +113,7 @@ export function toastDatabase(title: string, message: string, options = {}) {
         <span className="font-medium">{title}</span>
         <button
           onClick={() => toast.dismiss()}
-          className="hover:bg-primary/10 rounded-full p-1 transition-colors"
+          className="hover:bg-primary/10 cursor-pointer rounded-full p-1 transition-colors"
         >
           <XIcon className="h-3 w-3" />
         </button>

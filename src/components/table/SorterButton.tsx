@@ -24,6 +24,7 @@ const SorterButton = memo(({ column }: { column: string }) => {
             title="Sort column in descending order"
             type="button"
             aria-label="Sort Descending"
+            className="cursor-pointer"
             onClick={() => handleQuerySorter(column)}
           >
             <MemoizedArrowDownNarrowWideIcon className="h-3 w-3" />
@@ -33,6 +34,7 @@ const SorterButton = memo(({ column }: { column: string }) => {
             title="Sort column in ascending order"
             type="button"
             aria-label="Sort Ascending"
+            className="cursor-pointer"
             onClick={() => handleQuerySorter(column)}
           >
             <MemoizedArrowUpNarrowWideIcon className="h-3 w-3" />
@@ -43,6 +45,7 @@ const SorterButton = memo(({ column }: { column: string }) => {
           title="Sort column in ascending order"
           type="button"
           aria-label="Sort Column"
+          className="cursor-pointer"
           onClick={() => handleQuerySorter(column)}
         >
           <MemoizedArrowUpDownIcon className="h-3 w-3" />
