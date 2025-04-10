@@ -30,7 +30,7 @@ const PaginationControls = () => {
         <div className="flex items-center rounded-md border shadow-sm">
           <Button
             onClick={() => handlePageChange("first")}
-            disabled={offset === 0 || isDataLoading}
+            disabled={offset === 0 || isDataLoading || !maxSize}
             size="icon"
             variant="ghost"
             className="h-8 w-8 rounded-l-md rounded-r-none border-r"
@@ -40,7 +40,7 @@ const PaginationControls = () => {
           </Button>
           <Button
             onClick={() => handlePageChange("prev")}
-            disabled={offset === 0 || isDataLoading}
+            disabled={offset === 0 || isDataLoading || !maxSize}
             size="icon"
             variant="ghost"
             className="h-8 w-8 rounded-none border-r"
@@ -49,17 +49,21 @@ const PaginationControls = () => {
             <ChevronLeftIcon className="h-4 w-4" />
           </Button>
           <div className="flex items-center justify-center px-3 text-xs font-medium">
-            <span>
-              {offset + 1}
-              <span className="text-primary/50 mx-1">-</span>
-              {offset + limit > maxSize ? maxSize : offset + limit}
-              <span className="text-primary/50 mx-1">of</span>
-              {maxSize}
-            </span>
+            {maxSize ? (
+              <span>
+                {offset + 1}
+                <span className="text-primary/50 mx-1">-</span>
+                {offset + limit > maxSize ? maxSize : offset + limit}
+                <span className="text-primary/50 mx-1">of</span>
+                {maxSize}
+              </span>
+            ) : (
+              <span>No data</span>
+            )}
           </div>
           <Button
             onClick={() => handlePageChange("next")}
-            disabled={offset + limit >= maxSize || isDataLoading}
+            disabled={offset + limit >= maxSize || isDataLoading || !maxSize}
             size="icon"
             variant="ghost"
             className="h-8 w-8 rounded-none border-l"
@@ -69,7 +73,7 @@ const PaginationControls = () => {
           </Button>
           <Button
             onClick={() => handlePageChange("last")}
-            disabled={offset + limit >= maxSize || isDataLoading}
+            disabled={offset + limit >= maxSize || isDataLoading || !maxSize}
             size="icon"
             variant="ghost"
             className="h-8 w-8 rounded-l-none rounded-r-md border-l"
@@ -85,7 +89,7 @@ const PaginationControls = () => {
           variant="outline"
           className="h-8 text-xs font-medium shadow-sm"
           onClick={handleInsert}
-          disabled={isInserting}
+          disabled={isInserting || !maxSize}
         >
           <PlusIcon className="mr-2 h-3.5 w-3.5" />
           Insert row

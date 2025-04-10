@@ -437,6 +437,10 @@ export const DatabaseWorkerProvider = ({
     (type: "next" | "prev" | "first" | "last" | number) => {
       const currentOffset = useDatabaseStore.getState().offset;
 
+      if (!maxSize) {
+        return;
+      }
+
       // use currentOffset instead of prev
       if (typeof type === "number") {
         setOffset(type);
