@@ -73,7 +73,7 @@ const EditSection = () => {
           </div>
         </label>
         <div className="p-1">
-          {isText(schema[index]?.type || "") ? (
+          {isText(schema[index]?.type ?? "") ? (
             <Textarea
               id={column}
               name={column}
@@ -89,7 +89,7 @@ const EditSection = () => {
               id={column}
               name={column}
               type={
-                isNumber(schema[index]?.type || "")
+                isNumber(schema[index]?.type ?? "")
                   ? "number"
                   : isDate(schema[index]?.type || "")
                     ? "date"

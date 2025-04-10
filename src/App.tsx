@@ -1,12 +1,11 @@
 import { useDatabaseStore } from "./store/useDatabaseStore";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import TopBar from "./components/TopBar";
+import TopBar from "@/components/TopBar";
 import StructureTab from "@/components/structureTab/StructureTab";
 import BrowseTab from "@/components/browseTab/BrowseTab";
 import ExecuteTab from "@/components/executeTab/ExecuteTab";
-
-import FileDropHandler from "./components/FileDropHandler";
+import FileDropHandler from "@/components/FileDropHandler";
 
 import {
   CodeIcon,
@@ -24,6 +23,7 @@ export default function App() {
     <FileDropHandler>
       <main className="bg-primary/5 flex h-screen flex-col overflow-hidden">
         <TopBar />
+
         <Tabs defaultValue="data" className="flex flex-1 flex-col">
           <TabsList className="bg-primary/5 h-9 w-full justify-start rounded-none border-b">
             <TabsTrigger
@@ -58,10 +58,22 @@ export default function App() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="max-h-custom-dvh flex-1 overflow-hidden">
+          <section className="max-h-custom-dvh flex-1 overflow-hidden">
             <TabsContent value="data" className="m-0 h-full border-none p-0">
               {isDatabaseLoading ? (
-                <LoadingIndicator message="Loading Database" />
+                <div className="flex h-full flex-col items-center justify-center gap-4">
+                  <div className="bg-primary/10 rounded-full p-4">
+                    <LoaderCircleIcon className="text-primary h-8 w-8 animate-spin" />
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-xl font-medium">
+                      Loading Database
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      Please wait while the database is initializing
+                    </span>
+                  </div>
+                </div>
               ) : (
                 <BrowseTab />
               )}
@@ -78,23 +90,9 @@ export default function App() {
             >
               <ExecuteTab />
             </TabsContent>
-          </div>
+          </section>
         </Tabs>
       </main>
     </FileDropHandler>
   );
 }
-
-const LoadingIndicator = ({ message }: { message: string }) => (
-  <div className="flex h-full flex-col items-center justify-center gap-4">
-    <div className="bg-primary/10 rounded-full p-4">
-      <LoaderCircleIcon className="text-primary h-8 w-8 animate-spin" />
-    </div>
-    <div className="flex flex-col items-center">
-      <span className="text-xl font-medium">{message}</span>
-      <span className="text-muted-foreground text-sm">
-        Please wait while the database is initializing
-      </span>
-    </div>
-  </div>
-);

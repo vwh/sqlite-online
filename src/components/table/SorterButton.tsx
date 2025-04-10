@@ -8,50 +8,48 @@ import {
   ArrowUpNarrowWideIcon
 } from "lucide-react";
 
-const MemoizedArrowUpDownIcon = memo(ArrowUpDownIcon);
-const MemoizedArrowUpNarrowWideIcon = memo(ArrowUpNarrowWideIcon);
-const MemoizedArrowDownNarrowWideIcon = memo(ArrowDownNarrowWideIcon);
-
 const SorterButton = memo(({ column }: { column: string }) => {
   const sorters = useDatabaseStore((state) => state.sorters);
   const { handleQuerySorter } = useDatabaseWorker();
 
-  return (
-    <>
-      {sorters?.[column] ? (
-        sorters[column] === "asc" ? (
-          <button
-            title="Sort column in descending order"
-            type="button"
-            aria-label="Sort Descending"
-            className="cursor-pointer"
-            onClick={() => handleQuerySorter(column)}
-          >
-            <MemoizedArrowDownNarrowWideIcon className="h-3 w-3" />
-          </button>
-        ) : (
-          <button
-            title="Sort column in ascending order"
-            type="button"
-            aria-label="Sort Ascending"
-            className="cursor-pointer"
-            onClick={() => handleQuerySorter(column)}
-          >
-            <MemoizedArrowUpNarrowWideIcon className="h-3 w-3" />
-          </button>
-        )
-      ) : (
+  if (sorters?.[column]) {
+    if (sorters[column] === "asc") {
+      return (
         <button
-          title="Sort column in ascending order"
+          title="Sort column in descending order"
           type="button"
-          aria-label="Sort Column"
+          aria-label="Sort descending"
           className="cursor-pointer"
           onClick={() => handleQuerySorter(column)}
         >
-          <MemoizedArrowUpDownIcon className="h-3 w-3" />
+          <ArrowDownNarrowWideIcon className="h-3 w-3" />
         </button>
-      )}
-    </>
+      );
+    } else {
+      return (
+        <button
+          title="Sort column in ascending order"
+          type="button"
+          aria-label="Sort ascending"
+          className="cursor-pointer"
+          onClick={() => handleQuerySorter(column)}
+        >
+          <ArrowUpNarrowWideIcon className="h-3 w-3" />
+        </button>
+      );
+    }
+  }
+
+  return (
+    <button
+      title="Sort column in ascending order"
+      type="button"
+      aria-label="Sort column"
+      className="cursor-pointer"
+      onClick={() => handleQuerySorter(column)}
+    >
+      <ArrowUpDownIcon className="h-3 w-3" />
+    </button>
   );
 });
 

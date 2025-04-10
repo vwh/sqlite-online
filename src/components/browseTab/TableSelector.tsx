@@ -16,7 +16,7 @@ const TableSelector = () => {
   const currentTable = useDatabaseStore((state) => state.currentTable);
 
   return (
-    <Select onValueChange={handleTableChange} value={currentTable || undefined}>
+    <Select onValueChange={handleTableChange} value={currentTable ?? undefined}>
       <SelectTrigger className="border-primary/20 h-8 w-30 border text-sm sm:w-48">
         <SelectValue placeholder="Select Table" />
       </SelectTrigger>

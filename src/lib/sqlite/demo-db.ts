@@ -3,11 +3,6 @@ const DEMO_DB = `
 -- Enable foreign key support
 PRAGMA foreign_keys = ON;
 
--- Drop existing tables if they exist
-DROP TABLE IF EXISTS Orders;
-DROP TABLE IF EXISTS Customers;
-DROP TABLE IF EXISTS Products;
-
 -- Create Customers Table
 CREATE TABLE Customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

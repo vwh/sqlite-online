@@ -1,16 +1,7 @@
 import { QueryExecResult } from "sql.js";
 import Sqlite, { CustomQueryError, arrayToCSV } from "./sqlite";
 
-import type {
-  DeleteEvent,
-  ExecEvent,
-  ExportEvent,
-  GetTableDataEvent,
-  InsertEvent,
-  RefreshEvent,
-  UpdateEvent,
-  WorkerEvent
-} from "@/types";
+import type { WorkerEvent } from "@/types";
 
 // Global variable to store the database instance
 let instance: Sqlite | null = null;
@@ -70,9 +61,10 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
         break;
       }
       // Refreshes the current table data
-      case "refresh": {
-        const { currentTable, limit, offset, filters, sorters } =
-          payload as RefreshEvent["payload"];
+      // Gets the table data for the current table/table-options
+      case "refresh":
+      case "getTableData": {
+        const { currentTable, limit, offset, filters, sorters } = payload;
 
         const [results, maxSize] = instance.getTableData(
           currentTable,
@@ -95,7 +87,7 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       case "exec": {
         try {
           const { query, currentTable, limit, offset, filters, sorters } =
-            payload as ExecEvent["payload"];
+            payload;
 
           const [results, doTablesChanged] = instance.exec(query);
 
@@ -147,27 +139,6 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
 
         break;
       }
-      // Gets the table data for the current table/table-options
-      case "getTableData": {
-        const { currentTable, limit, offset, filters, sorters } =
-          payload as GetTableDataEvent["payload"];
-
-        const [results, maxSize] = instance.getTableData(
-          currentTable,
-          limit,
-          offset,
-          filters,
-          sorters
-        );
-
-        // Send the table data response to the main thread
-        self.postMessage({
-          action: "queryComplete",
-          payload: { results, maxSize }
-        });
-
-        break;
-      }
       // Downloads the database as bytes
       case "download": {
         const bytes = instance.download();
@@ -182,8 +153,7 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       }
       // Updates the values of a row in a table
       case "update": {
-        const { table, columns, values, primaryValue } =
-          payload as UpdateEvent["payload"];
+        const { table, columns, values, primaryValue } = payload;
 
         instance.update(table, columns, values, primaryValue);
 
@@ -197,7 +167,7 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       }
       // Deletes a row from a table
       case "delete": {
-        const { table, primaryValue } = payload as DeleteEvent["payload"];
+        const { table, primaryValue } = payload;
 
         instance.delete(table, primaryValue);
 
@@ -211,7 +181,7 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       }
       // Inserts a row into a table
       case "insert": {
-        const { table, columns, values } = payload as InsertEvent["payload"];
+        const { table, columns, values } = payload;
 
         instance.insert(table, columns, values);
 
@@ -234,7 +204,7 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
           offset,
           exportType,
           customQuery
-        } = payload as ExportEvent["payload"];
+        } = payload;
 
         let results: QueryExecResult[];
         if (exportType === "table") {

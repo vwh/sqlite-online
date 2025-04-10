@@ -14,17 +14,9 @@ import { usePanelManager } from "./PanelProvider";
 import { toastError, toastInfo, toastSuccess } from "@/components/Toaster";
 
 import type {
-  CustomQueryCompleteResponse,
-  DownloadCompleteResponse,
   EditTypes,
-  ExportCompleteResponse,
   exportTypes,
-  InitCompleteResponse,
-  QueryCompleteResponse,
-  QueryErrorResponse,
   Sorters,
-  UpdateCompleteResponse,
-  UpdateInstanceResponse,
   WorkerResponseEvent
 } from "@/types";
 
@@ -111,7 +103,7 @@ export const DatabaseWorkerProvider = ({
 
       // When the worker is initialized
       if (action === "initComplete") {
-        const { payload } = workerEvent as InitCompleteResponse;
+        const { payload } = workerEvent;
 
         setTablesSchema(payload.tableSchema);
         setIndexesSchema(payload.indexSchema);
@@ -132,7 +124,7 @@ export const DatabaseWorkerProvider = ({
       }
       // When the query is executed and returns results
       else if (action === "queryComplete") {
-        const { payload } = workerEvent as QueryCompleteResponse;
+        const { payload } = workerEvent;
 
         setMaxSize(payload.maxSize);
 
@@ -153,7 +145,7 @@ export const DatabaseWorkerProvider = ({
       }
       // When the custom query is executed and returns results
       else if (action === "customQueryComplete") {
-        const { payload } = workerEvent as CustomQueryCompleteResponse;
+        const { payload } = workerEvent;
 
         const results = payload.results;
         if (!results) {
@@ -175,7 +167,7 @@ export const DatabaseWorkerProvider = ({
       }
       // When the database is updated and requires a new schema
       else if (action === "updateInstance") {
-        const { payload } = workerEvent as UpdateInstanceResponse;
+        const { payload } = workerEvent;
 
         setTablesSchema(payload.tableSchema);
         setIndexesSchema(payload.indexSchema);
@@ -186,7 +178,7 @@ export const DatabaseWorkerProvider = ({
       }
       // When a row is updated
       else if (action === "updateComplete") {
-        const { payload } = workerEvent as UpdateCompleteResponse;
+        const { payload } = workerEvent;
 
         setErrorMessage(null);
         handleCloseEdit();
@@ -202,7 +194,7 @@ export const DatabaseWorkerProvider = ({
       }
       // When the database is downloaded
       else if (action === "downloadComplete") {
-        const { payload } = workerEvent as DownloadCompleteResponse;
+        const { payload } = workerEvent;
 
         const blob = new Blob([payload.bytes], {
           type: "application/octet-stream"
@@ -217,7 +209,7 @@ export const DatabaseWorkerProvider = ({
       }
       // When the database is exported
       else if (action === "exportComplete") {
-        const { payload } = workerEvent as ExportCompleteResponse;
+        const { payload } = workerEvent;
 
         const blob = new Blob([payload.results], {
           type: "text/csv"
@@ -232,7 +224,7 @@ export const DatabaseWorkerProvider = ({
       }
       // When the worker encounters an error
       else if (action === "queryError") {
-        const { payload } = workerEvent as QueryErrorResponse;
+        const { payload } = workerEvent;
 
         console.error("Worker error:", payload.error);
 
@@ -273,7 +265,8 @@ export const DatabaseWorkerProvider = ({
     setSorters,
     setSelectedRowObject,
     handleCloseEdit,
-    setIsInserting
+    setIsInserting,
+    setCustomQuery
   ]);
 
   // When fetching data, ask the worker for new data
@@ -295,9 +288,6 @@ export const DatabaseWorkerProvider = ({
       const dataSectionHight = document
         .getElementById("dataSection")
         ?.getBoundingClientRect().height;
-      // const tableCellHight = document
-      //   .getElementById("tableCell")
-      //   ?.getBoundingClientRect().height;
       const paginationControlsHight = document
         .getElementById("paginationControls")
         ?.getBoundingClientRect().height;

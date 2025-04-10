@@ -13,9 +13,9 @@ import type {
 
 export default class Sqlite {
   // Static SQL.js instance
-  static sqlJsStatic?: SqlJsStatic;
+  static readonly sqlJsStatic?: SqlJsStatic;
   // Database instance
-  private db: Database;
+  private readonly db: Database;
 
   public firstTable: string | null = null;
   public tablesSchema: TableSchema = {};
@@ -306,7 +306,7 @@ export default class Sqlite {
 
 // Check if the SQL statement is a structure changeable statement
 function isStructureChangeable(sql: string) {
-  const match = sql.match(/^\s*(CREATE|DROP|ALTER)\s/i);
+  const match = RegExp(/^\s*(CREATE|DROP|ALTER)\s/i).exec(sql);
   return match !== null;
 }
 

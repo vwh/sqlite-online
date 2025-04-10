@@ -91,7 +91,10 @@ const BrowseDataTab = () => {
         <TableSelector />
         <ActionButtons />
         {(isDataLoading || isDatabaseLoading) && (
-          <LoadingIndicator text="Loading data" />
+          <span className="ml-2 flex items-center text-xs text-gray-500">
+            <LoaderCircleIcon className="mr-1 h-3 w-3 animate-spin" />
+            Loading data
+          </span>
         )}
       </div>
 
@@ -139,12 +142,5 @@ const BrowseDataTab = () => {
     </div>
   );
 };
-
-const LoadingIndicator = ({ text }: { text: string }) => (
-  <span className="ml-2 flex items-center text-xs text-gray-500">
-    <LoaderCircleIcon className="mr-1 h-3 w-3 animate-spin" />
-    {text}
-  </span>
-);
 
 export default BrowseDataTab;

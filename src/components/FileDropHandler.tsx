@@ -9,7 +9,7 @@ interface FileDropHandlerProps {
   children: React.ReactNode;
 }
 
-function FileDropHandler({ children }: FileDropHandlerProps) {
+function FileDropHandler({ children }: Readonly<FileDropHandlerProps>) {
   const { handleFileUpload } = useDatabaseWorker();
 
   const [isDragging, setIsDragging] = useState(false);

@@ -15,9 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Span } from "@/components/ui/span";
 import ColumnIcon from "@/components/table/ColumnIcon";
 import FilterInput from "@/components/table/FilterInput";
+import SorterButton from "../table/SorterButton";
+import Badge from "@/components/ui/badge";
 
 import { DatabaseIcon, FilterXIcon } from "lucide-react";
-import SorterButton from "../table/SorterButton";
 
 const DataTable = () => {
   const data = useDatabaseStore((state) => state.data);
@@ -74,7 +75,7 @@ const DataTable = () => {
       <FilterInput
         key={column}
         column={column}
-        value={filters?.[column] || ""}
+        value={filters?.[column] ?? ""}
         onChange={handleQueryFilter}
       />
     ));
@@ -118,21 +119,19 @@ const DataTable = () => {
               >
                 {displayData.map((value, j) => (
                   <TableCell key={j} className="border-primary/5 border-t p-2">
-                    {value ? (
+                    {value === null ? (
+                      <Badge>
+                        {value === null ? "NULL" : JSON.stringify(value)}
+                      </Badge>
+                    ) : (
                       <>
                         {tablesSchema[currentTable!].schema[j]?.type ===
                         "BLOB" ? (
-                          <span className="text-muted-foreground bg-primary/5 rounded px-2 py-0.5 text-xs italic">
-                            BLOB
-                          </span>
+                          <Badge>BLOB</Badge>
                         ) : (
                           <Span className="text-xs">{value}</Span>
                         )}
                       </>
-                    ) : (
-                      <span className="text-muted-foreground bg-primary/5 rounded px-2 py-0.5 text-xs italic">
-                        {value === null ? "NULL" : JSON.stringify(value)}
-                      </span>
                     )}
                   </TableCell>
                 ))}
@@ -142,7 +141,7 @@ const DataTable = () => {
         ) : (
           <TableRow>
             <TableCell
-              colSpan={columns?.length || 1}
+              colSpan={columns?.length ?? 1}
               className="h-32 text-center"
             >
               {emptyDataContent}

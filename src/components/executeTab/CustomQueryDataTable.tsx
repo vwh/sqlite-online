@@ -9,6 +9,8 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Span } from "@/components/ui/span";
+import Badge from "@/components/ui/badge";
+
 import { DatabaseIcon, TableIcon } from "lucide-react";
 
 const CustomQueryDataTable = () => {
@@ -58,8 +60,8 @@ const CustomQueryDataTable = () => {
   }
 
   return (
-    <div className="shadow-sm">
-      <div className="bg-primary/5 border-b p-3">
+    <div className="flex h-full flex-col shadow-sm">
+      <div className="bg-primary/5 flex-shrink-0 border-b p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TableIcon className="text-primary/70 h-4 w-4" />
@@ -76,7 +78,7 @@ const CustomQueryDataTable = () => {
         </div>
       </div>
 
-      <div className="overflow-auto">
+      <div className="h-0 min-h-0 flex-grow overflow-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-primary/5 border-b">
@@ -103,9 +105,7 @@ const CustomQueryDataTable = () => {
                     {value !== null ? (
                       <Span className="text-xs">{value}</Span>
                     ) : (
-                      <span className="text-muted-foreground bg-primary/5 rounded px-2 py-0.5 text-xs italic">
-                        NULL
-                      </span>
+                      <Badge>NULL</Badge>
                     )}
                   </TableCell>
                 ))}
