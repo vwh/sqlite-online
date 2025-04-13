@@ -17,7 +17,6 @@ import {
   ChevronsUpDownIcon,
   ChevronsDownUpIcon,
   TagIcon,
-  TableIcon,
   SearchIcon,
   DatabaseIcon
 } from "lucide-react";
@@ -137,7 +136,7 @@ const SectionHeader = memo(
           <ToggleChevron expanded={expanded} size={5} />
         </div>
         {icon}
-        <span>{title}</span>
+        <Span className="flex items-center gap-1">{title}</Span>
         {children}
       </header>
     );
@@ -273,27 +272,6 @@ const SchemaSearch = memo(
   }
 );
 
-const SchemaFooter = memo(
-  ({ tableCount, indexCount }: { tableCount: number; indexCount: number }) => {
-    return (
-      <footer className="bg-primary/5 text-primary/60 flex items-center justify-between gap-2 border-t p-2 text-xs">
-        <div className="flex items-center">
-          <TableIcon className="mr-1 h-3 w-3 text-wrap" />
-          <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-            {tableCount} Tables
-          </span>
-        </div>
-        <div className="flex items-center">
-          <TagIcon className="mr-1 h-3 w-3" />
-          <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-            {indexCount} Indexes
-          </span>
-        </div>
-      </footer>
-    );
-  }
-);
-
 const SchemaTree = () => {
   const [filter, setFilter] = useState("");
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
@@ -335,10 +313,6 @@ const SchemaTree = () => {
           <IndexesSection indexes={filteredIndexes} />
         )}
       </nav>
-      <SchemaFooter
-        tableCount={Object.keys(tablesSchema).length}
-        indexCount={indexesSchema.length}
-      />
     </main>
   );
 };
