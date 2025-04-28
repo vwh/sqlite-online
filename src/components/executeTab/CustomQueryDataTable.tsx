@@ -1,17 +1,14 @@
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
+
 import { Span } from "@/components/ui/span";
 import Badge from "@/components/ui/badge";
 
 import { DatabaseIcon, TableIcon } from "lucide-react";
+
+const ROW_HEIGHT = 36;
 
 const CustomQueryDataTable = () => {
   const customQueryObject = useDatabaseStore(
@@ -36,7 +33,7 @@ const CustomQueryDataTable = () => {
 
   if (!customQueryObject.data || customQueryObject.data.length === 0) {
     return (
-      <div className="shadow-sm">
+      <div className="h-full shadow-sm">
         <div className="bg-primary/5 border-b p-3">
           <div className="flex items-center gap-2">
             <TableIcon className="text-primary/70 h-4 w-4" />
@@ -60,59 +57,98 @@ const CustomQueryDataTable = () => {
   }
 
   return (
-    <div className="flex h-full flex-col shadow-sm">
+    <div className="flex h-full w-full flex-col shadow-sm">
       <div className="bg-primary/5 flex-shrink-0 border-b p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TableIcon className="text-primary/70 h-4 w-4" />
-            <h3 className="text-sm font-medium">Query Results</h3>
+            <Span className="mr-2 text-sm font-medium text-nowrap">
+              Query Results
+            </Span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="bg-primary/10 rounded-full px-2 py-0.5 text-xs">
+            <Span className="bg-primary/10 rounded-full px-2 py-0.5 text-xs text-nowrap">
               {customQueryObject.data.length} rows
-            </span>
-            <span className="bg-primary/10 rounded-full px-2 py-0.5 text-xs">
+            </Span>
+            <Span className="bg-primary/10 rounded-full px-2 py-0.5 text-xs text-nowrap">
               {customQueryObject.columns.length} columns
-            </span>
+            </Span>
           </div>
         </div>
       </div>
 
-      <div className="h-0 min-h-0 flex-grow overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-primary/5 border-b">
-              {customQueryObject.columns.map((column) => (
-                <TableHead
-                  key={column}
-                  className="bg-primary/5 sticky top-0 z-10 p-2 text-xs font-medium"
-                >
-                  <div className="flex items-center gap-1">
-                    <Span className="text-foreground capitalize">{column}</Span>
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {customQueryObject.data.map((row, i) => (
-              <TableRow
-                key={i}
-                className="hover:bg-primary/5 border-primary/5 border-t text-xs transition-colors"
+      <div className="h-0 min-h-0 flex-grow overflow-hidden">
+        <AutoSizer>
+          {({ height, width }) => (
+            <div style={{ height, width }}>
+              {/* Table Header */}
+              <div
+                className="bg-primary/5 sticky top-0 z-10 flex border-b"
+                style={{ width }}
               >
-                {row.map((value, j) => (
-                  <TableCell key={j} className="border-primary/5 border-t p-2">
-                    {value !== null ? (
-                      <Span className="text-xs">{value}</Span>
-                    ) : (
-                      <Badge>NULL</Badge>
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                {customQueryObject.columns.map((column) => {
+                  const columnWidth = 100 / customQueryObject.columns.length;
+                  return (
+                    <div
+                      key={column}
+                      className="p-2 text-xs font-medium text-ellipsis whitespace-nowrap"
+                      style={{
+                        width: `${columnWidth}%`,
+
+                        flexShrink: 0
+                      }}
+                    >
+                      <Span className="text-foreground capitalize">
+                        {column}
+                      </Span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Virtualized Rows */}
+              <List
+                height={height - ROW_HEIGHT}
+                width={width}
+                itemCount={customQueryObject.data.length}
+                itemSize={ROW_HEIGHT}
+                overscanCount={5}
+              >
+                {({ index, style }) => {
+                  const row = customQueryObject.data[index];
+                  return (
+                    <div
+                      style={{ ...style, display: "flex", width }}
+                      key={index}
+                    >
+                      {row.map((value, cellIndex) => {
+                        const columnWidth =
+                          100 / customQueryObject.columns.length;
+                        return (
+                          <div
+                            key={cellIndex}
+                            className="border-primary/5 overflow-hidden border-t p-2 text-ellipsis whitespace-nowrap"
+                            style={{
+                              width: `${columnWidth}%`,
+                              minWidth: "100px",
+                              flexShrink: 0
+                            }}
+                          >
+                            {value !== null ? (
+                              <Span className="text-xs">{String(value)}</Span>
+                            ) : (
+                              <Badge>NULL</Badge>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                }}
+              </List>
+            </div>
+          )}
+        </AutoSizer>
       </div>
     </div>
   );
