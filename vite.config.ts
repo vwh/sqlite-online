@@ -15,7 +15,6 @@ export default defineConfig({
       }
     }),
     tailwindcss(),
-    // MillionLint.vite(),
     compression(),
     viteImagemin({
       gifsicle: {

@@ -1,12 +1,7 @@
 import React from "react";
 import { toast, Toaster } from "sonner";
 
-import {
-  CheckCircle2Icon,
-  InfoIcon,
-  AlertCircleIcon,
-  XIcon
-} from "lucide-react";
+import { CheckCircle2Icon, InfoIcon, AlertCircleIcon } from "lucide-react";
 
 export function AppToaster() {
   return (
@@ -106,42 +101,16 @@ export function toastInfo(message: string | React.ReactNode, options = {}) {
   }
 }
 
-export function toastDatabase(title: string, message: string, options = {}) {
-  return toast(
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between">
-        <span className="font-medium">{title}</span>
-        <button
-          onClick={() => toast.dismiss()}
-          className="hover:bg-primary/10 cursor-pointer rounded-full p-1 transition-colors"
-        >
-          <XIcon className="h-3 w-3" />
-        </button>
-      </div>
-      <p className="text-muted-foreground text-sm capitalize">{message}</p>
-    </div>,
-    {
-      style: {
-        borderLeft: "4px solid var(--primary)",
-        background: "var(--background)",
-        padding: "0.75rem"
-      },
-      duration: 5000,
-      ...options
-    }
-  );
-}
-
-export function toastLoading(message: string) {
-  return toast(
-    <div className="flex items-center gap-2">
-      <div className="flex-1 capitalize">{message}</div>
-    </div>,
-    {
-      style: {
-        borderLeft: "4px solid var(--primary)",
-        background: "var(--background)"
-      }
-    }
-  );
-}
+// export function toastLoading(message: string) {
+//   return toast(
+//     <div className="flex items-center gap-2">
+//       <div className="flex-1 capitalize">{message}</div>
+//     </div>,
+//     {
+//       style: {
+//         borderLeft: "4px solid var(--primary)",
+//         background: "var(--background)"
+//       }
+//     }
+//   );
+// }

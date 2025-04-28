@@ -1,4 +1,4 @@
-import { QueryExecResult, SqlValue } from "sql.js";
+import type { QueryExecResult, SqlValue } from "sql.js";
 
 export type TableSchema = {
   [tableName: string]: {
@@ -29,19 +29,19 @@ export type EditTypes = "insert" | "update" | "delete";
 export type exportTypes = "table" | "current" | "custom";
 
 // --- WORKER MESSAGES --- //
-export interface InitEvent {
+interface InitEvent {
   action: "init";
   payload: undefined;
 }
 
-export interface OpenFileEvent {
+interface OpenFileEvent {
   action: "openFile";
   payload: {
     file: ArrayBuffer;
   };
 }
 
-export interface RefreshEvent {
+interface RefreshEvent {
   action: "refresh";
   payload: {
     currentTable: string;
@@ -52,7 +52,7 @@ export interface RefreshEvent {
   };
 }
 
-export interface ExecEvent {
+interface ExecEvent {
   action: "exec";
   payload: {
     query: string;
@@ -64,7 +64,7 @@ export interface ExecEvent {
   };
 }
 
-export interface GetTableDataEvent {
+interface GetTableDataEvent {
   action: "getTableData";
   payload: {
     currentTable: string;
@@ -75,12 +75,12 @@ export interface GetTableDataEvent {
   };
 }
 
-export interface DownloadEvent {
+interface DownloadEvent {
   action: "download";
   payload: undefined;
 }
 
-export interface UpdateEvent {
+interface UpdateEvent {
   action: "update";
   payload: {
     table: string;
@@ -90,7 +90,7 @@ export interface UpdateEvent {
   };
 }
 
-export interface DeleteEvent {
+interface DeleteEvent {
   action: "delete";
   payload: {
     table: string;
@@ -98,7 +98,7 @@ export interface DeleteEvent {
   };
 }
 
-export interface InsertEvent {
+interface InsertEvent {
   action: "insert";
   payload: {
     table: string;
@@ -107,7 +107,7 @@ export interface InsertEvent {
   };
 }
 
-export interface ExportEvent {
+interface ExportEvent {
   action: "export";
   payload: {
     table: string;
@@ -133,7 +133,7 @@ export type WorkerEvent =
   | ExportEvent;
 
 // --- WORKER RESPONSE --- //
-export interface InitCompleteResponse {
+interface InitCompleteResponse {
   action: "initComplete";
   payload: {
     tableSchema: TableSchema;
@@ -142,7 +142,7 @@ export interface InitCompleteResponse {
   };
 }
 
-export interface QueryCompleteResponse {
+interface QueryCompleteResponse {
   action: "queryComplete";
   payload: {
     results?: QueryExecResult[];
@@ -150,14 +150,14 @@ export interface QueryCompleteResponse {
   };
 }
 
-export interface CustomQueryCompleteResponse {
+interface CustomQueryCompleteResponse {
   action: "customQueryComplete";
   payload: {
     results: QueryExecResult[];
   };
 }
 
-export interface UpdateInstanceResponse {
+interface UpdateInstanceResponse {
   action: "updateInstance";
   payload: {
     tableSchema: TableSchema;
@@ -165,32 +165,32 @@ export interface UpdateInstanceResponse {
   };
 }
 
-export interface UpdateCompleteResponse {
+interface UpdateCompleteResponse {
   action: "updateComplete";
   payload: {
     type: EditTypes;
   };
 }
 
-export interface InsertCompleteResponse {
+interface InsertCompleteResponse {
   action: "insertComplete";
 }
 
-export interface DownloadCompleteResponse {
+interface DownloadCompleteResponse {
   action: "downloadComplete";
   payload: {
     bytes: ArrayBuffer;
   };
 }
 
-export interface ExportCompleteResponse {
+interface ExportCompleteResponse {
   action: "exportComplete";
   payload: {
     results: string;
   };
 }
 
-export interface QueryErrorResponse {
+interface QueryErrorResponse {
   action: "queryError";
   payload: {
     error: {

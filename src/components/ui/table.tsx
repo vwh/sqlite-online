@@ -47,21 +47,21 @@ const TableBody = function TableBody({
   );
 };
 
-const TableFooter = function TableFooter({
-  className,
-  ...props
-}: React.ComponentProps<"tfoot">) {
-  return (
-    <tfoot
-      data-slot="table-footer"
-      className={cn(
-        "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
-        className
-      )}
-      {...props}
-    />
-  );
-};
+// const TableFooter = function TableFooter({
+//   className,
+//   ...props
+// }: React.ComponentProps<"tfoot">) {
+//   return (
+//     <tfoot
+//       data-slot="table-footer"
+//       className={cn(
+//         "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
+//         className
+//       )}
+//       {...props}
+//     />
+//   );
+// };
 
 const TableRow = function TableRow({
   className,
@@ -129,7 +129,7 @@ export {
   Table,
   TableHeader,
   TableBody,
-  TableFooter,
+  // TableFooter,
   TableHead,
   TableRow,
   TableCell
