@@ -16,7 +16,7 @@ import {
   SquarePenIcon,
   Trash2Icon
 } from "lucide-react";
-import { isDate, isNumber, isText } from "@/lib/sqlite/sqlite-type-check";
+import { isDate, isNumber, isText } from "@/sqlite/sqlite-type-check";
 
 const EditSection = () => {
   const { handleEditSubmit } = useDatabaseWorker();

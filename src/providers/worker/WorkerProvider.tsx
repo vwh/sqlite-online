@@ -64,7 +64,7 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
   useEffect(() => {
     // Create a new worker
     workerRef.current = new Worker(
-      new URL("./../../lib/sqlite/sqliteWorker.ts", import.meta.url),
+      new URL("@/sqlite/sqliteWorker.ts", import.meta.url),
       { type: "module" }
     );
 

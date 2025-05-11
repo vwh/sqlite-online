@@ -4,7 +4,7 @@ import {
   isText,
   isBlob,
   isBoolean
-} from "@/lib/sqlite/sqlite-type-check";
+} from "@/sqlite/sqlite-type-check";
 
 import type { TableSchemaRow } from "@/types";
 
