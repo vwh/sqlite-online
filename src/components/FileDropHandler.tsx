@@ -1,70 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
-import useDatabaseWorker from "@/hooks/useWorker";
-
-import showToast from "@/components/common/Toaster/Toast";
-
 import { DatabaseIcon } from "lucide-react";
+import useFileDrop from "@/hooks/useFileDrop";
 
 interface FileDropHandlerProps {
   children: React.ReactNode;
 }
 
 function FileDropHandler({ children }: Readonly<FileDropHandlerProps>) {
-  const { handleFileUpload } = useDatabaseWorker();
-
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Handle when user drags over the drop zone
-  const handleDragOver = useCallback((event: DragEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDragging(true);
-  }, []);
-
-  // Handle when user leaves the drop zone
-  const handleDragLeave = useCallback((event: DragEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDragging(false);
-  }, []);
-
-  // Handle when user drops file
-  const handleDrop = useCallback(
-    (event: DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setIsDragging(false);
-
-      try {
-        const files = event.dataTransfer?.files;
-        if (!files || files.length === 0) {
-          showToast("No file detected", "error");
-          return;
-        }
-
-        const file = files[0];
-        handleFileUpload(file);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to process file";
-        showToast(`Failed to process file: ${errorMessage}`, "error");
-      }
-    },
-    [handleFileUpload]
-  );
-
-  // Add event listeners
-  useEffect(() => {
-    window.addEventListener("dragover", handleDragOver);
-    window.addEventListener("dragleave", handleDragLeave);
-    window.addEventListener("drop", handleDrop);
-
-    return () => {
-      window.removeEventListener("dragover", handleDragOver);
-      window.removeEventListener("dragleave", handleDragLeave);
-      window.removeEventListener("drop", handleDrop);
-    };
-  }, [handleDragOver, handleDragLeave, handleDrop]);
+  const { isDragging } = useFileDrop();
 
   return (
     <>
