@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
-import { usePanelManager } from "@/providers/PanelProvider";
+import useDatabaseWorker from "@/hooks/useWorker";
+import usePanelManager from "@/hooks/usePanel";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
 

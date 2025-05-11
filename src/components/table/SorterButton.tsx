@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
+import useDatabaseWorker from "@/hooks/useWorker";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 
 import {

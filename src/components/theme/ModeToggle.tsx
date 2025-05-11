@@ -1,4 +1,4 @@
-import { useTheme } from "@/providers/ThemeProvider";
+import useTheme from "@/hooks/useTheme";
 
 import { Button } from "@/components/ui/button";
 

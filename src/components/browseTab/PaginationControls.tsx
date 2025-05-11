@@ -1,6 +1,6 @@
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
+import useDatabaseWorker from "@/hooks/useWorker";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
-import { usePanelManager } from "@/providers/PanelProvider";
+import usePanelManager from "@/hooks/usePanel";
 
 import { Button } from "@/components/ui/button";
 

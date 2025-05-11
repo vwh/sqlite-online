@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
-import { usePanelManager } from "@/providers/PanelProvider";
+import useDatabaseWorker from "@/hooks/useWorker";
+import usePanelManager from "@/hooks/usePanel";
 
 import {
   Table,

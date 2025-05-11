@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
+import useDatabaseWorker from "@/hooks/useWorker";
 
 import {
   ResizableHandle,

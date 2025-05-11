@@ -1,5 +1,5 @@
 import { useDatabaseStore } from "@/store/useDatabaseStore";
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
+import useDatabaseWorker from "@/hooks/useWorker";
 
 import {
   Select,

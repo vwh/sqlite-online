@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useDatabaseWorker } from "@/providers/DatabaseWorkerProvider";
+import useDatabaseWorker from "@/hooks/useWorker";
 
-import { toastError } from "./Toaster";
+import showToast from "@/components/common/Toaster/Toast";
 
 import { DatabaseIcon } from "lucide-react";
 
@@ -38,7 +38,7 @@ function FileDropHandler({ children }: Readonly<FileDropHandlerProps>) {
       try {
         const files = event.dataTransfer?.files;
         if (!files || files.length === 0) {
-          toastError("No file detected");
+          showToast("No file detected", "error");
           return;
         }
 
@@ -47,7 +47,7 @@ function FileDropHandler({ children }: Readonly<FileDropHandlerProps>) {
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Failed to process file";
-        toastError(`Failed to process file: ${errorMessage}`);
+        showToast(`Failed to process file: ${errorMessage}`, "error");
       }
     },
     [handleFileUpload]

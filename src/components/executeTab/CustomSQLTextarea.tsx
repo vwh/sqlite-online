@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
-import { useTheme } from "@/providers/ThemeProvider";
+import useTheme from "@/hooks/useTheme";
 
 import CodeMirror from "@uiw/react-codemirror";
 import { darcula } from "@uiw/codemirror-theme-darcula";
