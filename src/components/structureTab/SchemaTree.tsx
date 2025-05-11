@@ -1,283 +1,47 @@
-import { memo, useMemo, useState } from "react";
-import { useSchemaStore } from "@/store/useSchemaStore";
+import { useState, useMemo, useCallback } from "react";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 
-import { cn } from "@/lib/utils";
+import type { TableSchema } from "@/types";
 
-import type { TableSchema, IndexSchema, TableSchemaRow } from "@/types";
-
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Span } from "@/components/ui/span";
-import ColumnIcon from "@/components/table/ColumnIcon";
-
-import {
-  ChevronRightIcon,
-  ChevronDownIcon,
-  ChevronsUpDownIcon,
-  ChevronsDownUpIcon,
-  TagIcon,
-  SearchIcon,
-  DatabaseIcon
-} from "lucide-react";
-
-const TableColumn = memo(
-  ({ columnSchema }: { columnSchema: TableSchemaRow }) => {
-    return (
-      <div className="flex items-center justify-between gap-1">
-        <div className="flex items-center">
-          <ColumnIcon columnSchema={columnSchema} />
-          <span className="text-primary/60 ml-1 text-xs">
-            {columnSchema.name}
-          </span>
-        </div>
-        <Span className="text-primary/60 text-xs whitespace-nowrap">
-          <span className="text-primary/50 bg-primary/5 rounded-full px-2 py-0.5 text-xs">
-            {columnSchema.type}
-          </span>
-        </Span>
-      </div>
-    );
-  }
-);
-
-const MemoizedChevronDownIcon = memo(ChevronDownIcon);
-const MemoizedChevronRightIcon = memo(ChevronRightIcon);
-
-const ToggleChevron = memo(
-  ({ expanded, size = 4 }: { expanded: boolean; size?: number }) => {
-    return expanded ? (
-      <MemoizedChevronDownIcon className={`h-${size} w-${size}`} />
-    ) : (
-      <MemoizedChevronRightIcon className={`h-${size} w-${size}`} />
-    );
-  }
-);
-
-const TableItem = memo(
-  ({ name, table }: { name: string; table: { schema: TableSchemaRow[] } }) => {
-    const { expandedTables, toggleTable } = useSchemaStore();
-    const expanded = expandedTables.includes(name);
-
-    const handleToggle = () => toggleTable(name);
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        toggleTable(name);
-      }
-    };
-
-    return (
-      <article>
-        <div
-          className={cn(
-            "flex cursor-pointer items-center rounded px-1.5 py-1 transition-all hover:ml-2",
-            expanded && "ml-1"
-          )}
-          onClick={handleToggle}
-          onKeyDown={handleKeyDown}
-          aria-expanded={expanded}
-        >
-          <div className="flex h-5 w-5 items-center justify-center">
-            <ToggleChevron expanded={expanded} />
-          </div>
-          <span className="flex items-center gap-1 capitalize">
-            <span className="text-sm">{name}</span>
-            <span className="text-primary/50 text-xs">
-              ({table.schema.length})
-            </span>
-          </span>
-        </div>
-
-        {expanded && (
-          <div className="border-primary/20 mt-1 mb-2 ml-4 flex flex-col gap-1 space-y-0.5 border-l-2 pl-2">
-            {table.schema.map((columnSchema) => (
-              <TableColumn key={columnSchema.cid} columnSchema={columnSchema} />
-            ))}
-          </div>
-        )}
-      </article>
-    );
-  }
-);
-
-const SectionHeader = memo(
-  ({
-    title,
-    expanded,
-    icon,
-    onToggle,
-    children
-  }: {
-    title: string;
-    expanded: boolean;
-    icon: React.ReactNode;
-    onToggle: () => void;
-    children?: React.ReactNode;
-  }) => {
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onToggle();
-      }
-    };
-
-    return (
-      <header
-        className={cn(
-          "hover:bg-primary/5 bg-primary/7 flex cursor-pointer items-center px-2 py-2 transition-colors",
-          !expanded && "mb-0"
-        )}
-        onClick={onToggle}
-        onKeyDown={handleKeyDown}
-        aria-expanded={expanded}
-      >
-        <div className="flex h-5 w-5 items-center justify-center">
-          <ToggleChevron expanded={expanded} size={5} />
-        </div>
-        {icon}
-        <Span className="flex items-center gap-1">{title}</Span>
-        {children}
-      </header>
-    );
-  }
-);
-
-const TablesSection = memo(
-  ({ tablesSchema }: { tablesSchema: TableSchema }) => {
-    const {
-      expandedTableSection,
-      toggleTableSection,
-      expandAllTables,
-      collapseAllTables
-    } = useSchemaStore();
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    const handleExpandAll = (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      expandAllTables(tablesSchema);
-      setIsExpanded(true);
-    };
-
-    const handleCollapseAll = (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      collapseAllTables();
-      setIsExpanded(false);
-    };
-
-    const expandControls = expandedTableSection && (
-      <div className="ml-auto flex">
-        {isExpanded ? (
-          <Button
-            className="text-primary hover:bg-primary/5 h-7 rounded px-2 py-0.5 text-xs transition-colors"
-            variant="ghost"
-            size="icon"
-            onClick={handleCollapseAll}
-            aria-label="Collapse all tables"
-          >
-            <ChevronsDownUpIcon className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            className="text-primary hover:bg-primary/5 h-7 rounded px-2 py-0.5 text-xs transition-colors"
-            variant="ghost"
-            size="icon"
-            onClick={handleExpandAll}
-            aria-label="Expand all tables"
-          >
-            <ChevronsUpDownIcon className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-    );
-
-    return (
-      <section>
-        <SectionHeader
-          title="Tables"
-          expanded={expandedTableSection}
-          icon={<DatabaseIcon className="mr-2 h-4 w-4" />}
-          onToggle={toggleTableSection}
-        >
-          {expandControls}
-        </SectionHeader>
-
-        {expandedTableSection && (
-          <div className="space-y-0.5 overflow-y-auto pr-1 pl-2">
-            {Object.entries(tablesSchema).map(([tableName, tableData]) => (
-              <TableItem key={tableName} name={tableName} table={tableData} />
-            ))}
-          </div>
-        )}
-      </section>
-    );
-  }
-);
-
-// Index item component
-const IndexItem = memo(({ index }: { index: IndexSchema }) => {
-  return (
-    <article>
-      <div className="flex cursor-pointer items-center rounded px-1.5 py-1 transition-all hover:ml-2">
-        <div className="flex w-full items-center justify-between gap-1">
-          <span className="text-sm">{index.name}</span>
-          <Span className="text-primary/60 text-xs font-medium whitespace-nowrap">
-            <span className="text-primary/50 bg-primary/5 rounded-full px-2 py-0.5 text-xs">
-              {index.tableName}
-            </span>
-          </Span>
-        </div>
-      </div>
-    </article>
-  );
-});
-
-// Indexes section with expandable header
-const IndexesSection = memo(({ indexes }: { indexes: IndexSchema[] }) => {
-  const { expandedIndexSection, toggleIndexSection } = useSchemaStore();
-
-  return (
-    <section>
-      <SectionHeader
-        title="Indexes"
-        expanded={expandedIndexSection}
-        icon={<TagIcon className="mr-2 h-4 w-4" />}
-        onToggle={toggleIndexSection}
-      />
-
-      {expandedIndexSection && (
-        <div className="space-y-0.5 overflow-y-auto pr-1 pl-2">
-          {indexes.map((index) => (
-            <IndexItem key={index.name} index={index} />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-});
-
-const SchemaSearch = memo(
-  ({ onFilterChange }: { onFilterChange: (value: string) => void }) => {
-    return (
-      <div className="relative">
-        <SearchIcon className="text-primary/40 absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2 transform" />
-        <Input
-          placeholder="Search tables and indexes"
-          className="border-primary/20 h-8 w-full pl-8 text-sm text-[0.8rem]!"
-          onChange={(e) => onFilterChange(e.target.value)}
-          aria-label="Search tables and indexes"
-        />
-      </div>
-    );
-  }
-);
+import TablesSection from "./TablesSection";
+import IndexesSection from "./IndexesSection";
+import SchemaSearch from "./SchemaSearch";
 
 const SchemaTree = () => {
   const [filter, setFilter] = useState("");
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
   const indexesSchema = useDatabaseStore((state) => state.indexesSchema);
 
-  // Filter tables and indexes based on search term
+  const [expandedTables, setExpandedTables] = useState<string[]>([]);
+  const [expandedTableSection, setExpandedTableSection] = useState(true);
+  const [expandedIndexSection, setExpandedIndexSection] = useState(true);
+
+  const toggleTable = useCallback((tableName: string) => {
+    setExpandedTables((prevExpanded) =>
+      prevExpanded.includes(tableName)
+        ? prevExpanded.filter((name) => name !== tableName)
+        : [...prevExpanded, tableName]
+    );
+  }, []);
+
+  const toggleTableSection = useCallback(() => {
+    setExpandedTableSection((prev) => !prev);
+  }, []);
+
+  const toggleIndexSection = useCallback(() => {
+    setExpandedIndexSection((prev) => !prev);
+  }, []);
+
+  const expandAllTables = useCallback((tablesSchema: TableSchema) => {
+    setExpandedTables(Object.keys(tablesSchema));
+    setExpandedTableSection(true);
+  }, []);
+
+  const collapseAllTables = useCallback(() => {
+    setExpandedTables([]);
+    setExpandedTableSection(false);
+  }, []);
+
   const filteredTables = useMemo(() => {
     if (!filter) return tablesSchema;
 
@@ -303,17 +67,29 @@ const SchemaTree = () => {
   }, [indexesSchema, filter]);
 
   return (
-    <main className="flex h-full w-full flex-col overflow-hidden">
+    <section className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-primary/5 border-b p-2">
         <SchemaSearch onFilterChange={setFilter} />
       </div>
       <nav className="flex-1 overflow-auto">
-        <TablesSection tablesSchema={filteredTables} />
+        <TablesSection
+          tablesSchema={filteredTables}
+          expandedTableSection={expandedTableSection}
+          toggleTableSection={toggleTableSection}
+          expandAllTables={expandAllTables}
+          collapseAllTables={collapseAllTables}
+          expandedTables={expandedTables}
+          toggleTable={toggleTable}
+        />
         {indexesSchema.length > 0 && (
-          <IndexesSection indexes={filteredIndexes} />
+          <IndexesSection
+            indexes={filteredIndexes}
+            expandedIndexSection={expandedIndexSection}
+            toggleIndexSection={toggleIndexSection}
+          />
         )}
       </nav>
-    </main>
+    </section>
   );
 };
 
