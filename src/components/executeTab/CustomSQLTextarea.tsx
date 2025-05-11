@@ -165,7 +165,7 @@ const BUILT_IN_FUNCTIONS = [
   "UPPER"
 ];
 
-export default function CustomSQLTextarea() {
+function CustomSQLTextarea() {
   const { theme } = useTheme();
   const customQuery = useDatabaseStore((state) => state.customQuery);
   const setCustomQuery = useDatabaseStore((state) => state.setCustomQuery);
@@ -240,3 +240,5 @@ export default function CustomSQLTextarea() {
     />
   );
 }
+
+export default CustomSQLTextarea;

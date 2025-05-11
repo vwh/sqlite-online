@@ -22,8 +22,8 @@ export type IndexSchema = {
   tableName: string;
 };
 
-export type Sorters = Record<string, "asc" | "desc">;
-export type Filters = Record<string, string>;
+export type Sorters = Record<string, "asc" | "desc"> | null;
+export type Filters = Record<string, string> | null;
 
 export type EditTypes = "insert" | "update" | "delete";
 export type exportTypes = "table" | "current" | "custom";

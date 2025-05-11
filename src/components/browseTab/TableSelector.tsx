@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Span } from "@/components/ui/span";
 
-const TableSelector = () => {
+function TableSelector() {
   const { handleTableChange } = useDatabaseWorker();
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
   const currentTable = useDatabaseStore((state) => state.currentTable);
@@ -29,6 +29,6 @@ const TableSelector = () => {
       </SelectContent>
     </Select>
   );
-};
+}
 
 export default TableSelector;

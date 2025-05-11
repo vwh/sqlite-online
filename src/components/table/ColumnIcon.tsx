@@ -19,11 +19,11 @@ import {
   HelpCircleIcon
 } from "lucide-react";
 
-const ColumnIcon = ({
-  columnSchema
-}: {
+interface ColumnIconProps {
   columnSchema: TableSchemaRow | null;
-}) => {
+}
+
+function ColumnIcon({ columnSchema }: Readonly<ColumnIconProps>) {
   if (!columnSchema) return null;
 
   const { type, isPrimaryKey, isForeignKey } = columnSchema;
@@ -50,6 +50,6 @@ const ColumnIcon = ({
       {typeIcon}
     </div>
   );
-};
+}
 
 export default ColumnIcon;

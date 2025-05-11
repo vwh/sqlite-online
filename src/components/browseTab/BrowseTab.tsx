@@ -1,6 +1,5 @@
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
-import useDatabaseWorker from "@/hooks/useWorker";
 import usePanelManager from "@/hooks/usePanel";
 
 import {
@@ -8,26 +7,18 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from "@/components/ui/resizable";
-import { Button } from "@/components/ui/button";
+import SchemaTree from "@/components/structureTab/SchemaTree";
 import TableSelector from "./TableSelector";
-import ActionsDropdown from "./ActionsDropdown";
 import EditSection from "./EditSection";
 import DataTable from "./DataTable";
-import SchemaTree from "@/components/structureTab/SchemaTree";
 import PaginationControls from "./PaginationControls";
+import ActionButtons from "./ActionButtons";
 
-import {
-  LoaderCircleIcon,
-  FilterXIcon,
-  ListRestartIcon,
-  FolderOutputIcon
-} from "lucide-react";
+import { LoaderCircleIcon } from "lucide-react";
 
-const BrowseDataTab = () => {
+function BrowseDataTab() {
   const filters = useDatabaseStore((state) => state.filters);
   const sorters = useDatabaseStore((state) => state.sorters);
-  const setFilters = useDatabaseStore((state) => state.setFilters);
-  const setSorters = useDatabaseStore((state) => state.setSorters);
   const isDataLoading = useDatabaseStore((state) => state.isDataLoading);
   const isDatabaseLoading = useDatabaseStore(
     (state) => state.isDatabaseLoading
@@ -38,58 +29,13 @@ const BrowseDataTab = () => {
   const setDataPanelSize = usePanelStore((state) => state.setDataPanelSize);
   const setSchemaPanelSize = usePanelStore((state) => state.setSchemaPanelSize);
 
-  const { handleExport } = useDatabaseWorker();
   const { isEditing } = usePanelManager();
-
-  const ActionButtons = () => {
-    return (
-      <>
-        <div className="hidden items-center gap-1 md:flex">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 text-xs"
-            onClick={() => setFilters(null)}
-            disabled={filters == null}
-            title="Clear applied filters"
-          >
-            <FilterXIcon className="mr-1 h-3 w-3" />
-            Clear filters
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 text-xs"
-            onClick={() => setSorters(null)}
-            disabled={sorters == null}
-            title="Reset sorting"
-          >
-            <ListRestartIcon className="mr-1 h-3 w-3" />
-            Reset sorting
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 text-xs"
-            onClick={() => handleExport("table")}
-            title="Export the current table as CSV"
-          >
-            <FolderOutputIcon className="mr-1 h-3 w-3" />
-            Export table
-          </Button>
-        </div>
-        <div className="md:hidden">
-          <ActionsDropdown />
-        </div>
-      </>
-    );
-  };
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-1 border-b px-1 py-2">
         <TableSelector />
-        <ActionButtons />
+        <ActionButtons filters={filters} sorters={sorters} />
         {(isDataLoading || isDatabaseLoading) && (
           <span className="ml-2 flex items-center text-xs text-gray-500">
             <LoaderCircleIcon className="mr-1 h-3 w-3 animate-spin" />
@@ -141,6 +87,6 @@ const BrowseDataTab = () => {
       </div>
     </div>
   );
-};
+}
 
 export default BrowseDataTab;

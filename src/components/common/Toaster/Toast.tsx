@@ -11,7 +11,7 @@ const borderColorMap = {
   info: "#3b82f6"
 };
 
-export default function showToast(
+function showToast(
   message: string | React.ReactNode,
   type: ToastType = "info",
   options: ToastOptions = {}
@@ -45,3 +45,5 @@ export default function showToast(
     });
   }
 }
+
+export default showToast;

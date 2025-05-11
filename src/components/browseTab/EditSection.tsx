@@ -4,11 +4,13 @@ import usePanelManager from "@/hooks/usePanel";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
 
+import { isDate, isNumber, isText } from "@/sqlite/sqlite-type-check";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "../ui/textarea";
 import { Span } from "@/components/ui/span";
 import ColumnIcon from "@/components/table/ColumnIcon";
+import { Textarea } from "../ui/textarea";
 
 import {
   ChevronLeftIcon,
@@ -16,9 +18,8 @@ import {
   SquarePenIcon,
   Trash2Icon
 } from "lucide-react";
-import { isDate, isNumber, isText } from "@/sqlite/sqlite-type-check";
 
-const EditSection = () => {
+function EditSection() {
   const { handleEditSubmit } = useDatabaseWorker();
   const { selectedRowObject, isInserting, handleCloseEdit } = usePanelManager();
   const editValues = usePanelStore((state) => state.editValues);
@@ -193,6 +194,6 @@ const EditSection = () => {
       {actionButtons}
     </section>
   );
-};
+}
 
 export default EditSection;

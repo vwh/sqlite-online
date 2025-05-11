@@ -15,12 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Span } from "@/components/ui/span";
 import ColumnIcon from "@/components/table/ColumnIcon";
 import FilterInput from "@/components/table/FilterInput";
-import SorterButton from "../table/SorterButton";
 import Badge from "@/components/ui/badge";
+import SorterButton from "../table/SorterButton";
 
 import { DatabaseIcon, FilterXIcon } from "lucide-react";
 
-const DataTable = () => {
+function DataTable() {
   const data = useDatabaseStore((state) => state.data);
   const columns = useDatabaseStore((state) => state.columns);
   const currentTable = useDatabaseStore((state) => state.currentTable);
@@ -151,6 +151,6 @@ const DataTable = () => {
       </TableBody>
     </Table>
   );
-};
+}
 
 export default DataTable;

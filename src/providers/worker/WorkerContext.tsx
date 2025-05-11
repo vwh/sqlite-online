@@ -3,7 +3,7 @@ import { createContext } from "react";
 import { EditTypes, exportTypes } from "@/types";
 
 interface DatabaseWorkerContextProps {
-  workerRef: React.MutableRefObject<Worker | null>;
+  workerRef: { current: Worker | null };
   handleFileUpload: (file: File) => void;
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDownload: () => void;

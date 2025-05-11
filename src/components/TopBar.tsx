@@ -2,11 +2,11 @@ import useDatabaseWorker from "@/hooks/useWorker";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ModeToggle } from "@/components/theme/ModeToggle";
+import ModeToggle from "@/components/theme/ModeToggle";
 
 import { DatabaseIcon, SaveIcon, GithubIcon } from "lucide-react";
 
-const TopBar = () => {
+function TopBar() {
   const { handleFileChange, handleDownload } = useDatabaseWorker();
 
   return (
@@ -64,6 +64,6 @@ const TopBar = () => {
       </div>
     </header>
   );
-};
+}
 
 export default TopBar;

@@ -1,6 +1,6 @@
-import useDatabaseWorker from "@/hooks/useWorker";
-import { useDatabaseStore } from "@/store/useDatabaseStore";
 import usePanelManager from "@/hooks/usePanel";
+
+import type { exportTypes, Filters, Sorters } from "@/types";
 
 import {
   DropdownMenu,
@@ -18,13 +18,22 @@ import {
   PlusIcon
 } from "lucide-react";
 
-const ActionsDropdown = () => {
-  const { handleExport } = useDatabaseWorker();
+interface ActionDropdownProps {
+  setFilters: (filters: Filters) => void;
+  setSorters: (sorters: Sorters) => void;
+  filters: Filters;
+  sorters: Sorters;
+  handleExport: (exportType: exportTypes) => void;
+}
+
+function ActionsDropdown({
+  setFilters,
+  setSorters,
+  filters,
+  sorters,
+  handleExport
+}: Readonly<ActionDropdownProps>) {
   const { isInserting, handleInsert } = usePanelManager();
-  const filters = useDatabaseStore((state) => state.filters);
-  const setFilters = useDatabaseStore((state) => state.setFilters);
-  const sorters = useDatabaseStore((state) => state.sorters);
-  const setSorters = useDatabaseStore((state) => state.setSorters);
 
   return (
     <DropdownMenu>
@@ -100,6 +109,6 @@ const ActionsDropdown = () => {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+}
 
 export default ActionsDropdown;

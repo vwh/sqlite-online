@@ -15,8 +15,8 @@ interface DatabaseState {
   isDataLoading: boolean;
   errorMessage: string | null;
 
-  filters: Filters | null;
-  sorters: Sorters | null;
+  filters: Filters;
+  sorters: Sorters;
   limit: number;
   offset: number;
 
@@ -35,8 +35,8 @@ interface DatabaseState {
   setIsDatabaseLoading: (loading: boolean) => void;
   setIsDataLoading: (loading: boolean) => void;
   setErrorMessage: (message: string | null) => void;
-  setFilters: (filters: Filters | null) => void;
-  setSorters: (sorters: Sorters | null) => void;
+  setFilters: (filters: Filters) => void;
+  setSorters: (sorters: Sorters) => void;
   setLimit: (limit: number) => void;
   setOffset: (offset: number) => void;
 
@@ -76,8 +76,8 @@ export const useDatabaseStore = create<DatabaseState>((set) => ({
     set({ isDatabaseLoading }),
   setIsDataLoading: (isDataLoading: boolean) => set({ isDataLoading }),
   setErrorMessage: (errorMessage: string | null) => set({ errorMessage }),
-  setFilters: (filters: Filters | null) => set({ filters }),
-  setSorters: (sorters: Sorters | null) => set({ sorters }),
+  setFilters: (filters: Filters) => set({ filters }),
+  setSorters: (sorters: Sorters) => set({ sorters }),
   setLimit: (limit: number) => set({ limit }),
   setOffset: (offset: number) => set({ offset }),
 

@@ -10,8 +10,8 @@ import {
   ResizablePanelGroup
 } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
-import CustomSQLTextarea from "./CustomSQLTextarea";
 import SchemaTree from "@/components/structureTab/SchemaTree";
+import CustomSQLTextarea from "./CustomSQLTextarea";
 import CustomQueryDataTable from "./CustomQueryDataTable";
 
 import {
@@ -21,7 +21,7 @@ import {
   FolderOutputIcon
 } from "lucide-react";
 
-const ExecuteTab = () => {
+function ExecuteTab() {
   const errorMessage = useDatabaseStore((state) => state.errorMessage);
   const setErrorMessage = useDatabaseStore((state) => state.setErrorMessage);
   const isDataLoading = useDatabaseStore((state) => state.isDataLoading);
@@ -125,6 +125,6 @@ const ExecuteTab = () => {
       </div>
     </div>
   );
-};
+}
 
 export default ExecuteTab;

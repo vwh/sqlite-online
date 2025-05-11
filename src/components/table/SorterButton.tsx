@@ -8,7 +8,11 @@ import {
   ArrowUpNarrowWideIcon
 } from "lucide-react";
 
-const SorterButton = memo(({ column }: { column: string }) => {
+interface SorterButtonProps {
+  column: string;
+}
+
+const SorterButton = memo(({ column }: SorterButtonProps) => {
   const sorters = useDatabaseStore((state) => state.sorters);
   const { handleQuerySorter } = useDatabaseWorker();
 

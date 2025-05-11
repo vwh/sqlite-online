@@ -10,7 +10,7 @@ import { DatabaseIcon, TableIcon } from "lucide-react";
 
 const ROW_HEIGHT = 36;
 
-const CustomQueryDataTable = () => {
+function CustomQueryDataTable() {
   const customQueryObject = useDatabaseStore(
     (state) => state.customQueryObject
   );
@@ -152,6 +152,6 @@ const CustomQueryDataTable = () => {
       </div>
     </div>
   );
-};
+}
 
 export default CustomQueryDataTable;

@@ -13,7 +13,7 @@ import {
   PlusIcon
 } from "lucide-react";
 
-const PaginationControls = () => {
+function PaginationControls() {
   const { handlePageChange, handleExport } = useDatabaseWorker();
   const { isInserting, handleInsert } = usePanelManager();
   const offset = useDatabaseStore((state) => state.offset);
@@ -107,6 +107,6 @@ const PaginationControls = () => {
       </section>
     </footer>
   );
-};
+}
 
 export default PaginationControls;

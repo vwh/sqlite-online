@@ -14,7 +14,7 @@ import {
   TableIcon
 } from "lucide-react";
 
-export default function App() {
+function App() {
   const isDatabaseLoading = useDatabaseStore(
     (state) => state.isDatabaseLoading
   );
@@ -96,3 +96,5 @@ export default function App() {
     </FileDropHandler>
   );
 }
+
+export default App;

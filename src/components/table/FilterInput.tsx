@@ -9,12 +9,12 @@ interface FilterInputProps {
   debounceTime?: number;
 }
 
-const FilterInput = ({
+function FilterInput({
   column,
   value,
   onChange,
   debounceTime = 300
-}: FilterInputProps) => {
+}: Readonly<FilterInputProps>) {
   const [inputValue, setInputValue] = useState(value);
 
   // Update the local value when the prop value changes
@@ -54,6 +54,6 @@ const FilterInput = ({
       placeholder="Filter"
     />
   );
-};
+}
 
 export default FilterInput;
