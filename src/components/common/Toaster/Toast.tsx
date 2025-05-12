@@ -22,27 +22,31 @@ function showToast(
       error: <AlertCircleIcon className="h-5 w-5 text-red-500" />,
       info: <InfoIcon className="h-5 w-5 text-blue-500" />
     };
-    return toast(
-      <div className="flex items-center gap-2">
-        {iconMap[type]}
-        <div className="flex-1 capitalize">{message}</div>
-      </div>,
-      {
+    setTimeout(() => {
+      toast(
+        <div className="flex items-center gap-2">
+          {iconMap[type]}
+          <div className="flex-1 capitalize">{message}</div>
+        </div>,
+        {
+          style: {
+            borderLeft: `4px solid ${borderColorMap[type]}`,
+            background: "var(--background)"
+          },
+          ...options
+        }
+      );
+    }, 0);
+  } else {
+    setTimeout(() => {
+      toast(message, {
         style: {
           borderLeft: `4px solid ${borderColorMap[type]}`,
           background: "var(--background)"
         },
         ...options
-      }
-    );
-  } else {
-    return toast(message, {
-      style: {
-        borderLeft: `4px solid ${borderColorMap[type]}`,
-        background: "var(--background)"
-      },
-      ...options
-    });
+      });
+    }, 0);
   }
 }
 
