@@ -55,6 +55,8 @@ export default class Sqlite {
 
   // Execute a SQL statement
   public exec(sql: string) {
+    sql = sql.replace(/COLLATE\s+unicase/gi, "COLLATE NOCASE");
+
     const results = this.db.exec(sql);
     const upperSql = sql.toUpperCase();
     // If the statement requires schema updates
