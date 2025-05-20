@@ -5,7 +5,9 @@ import TopBar from "@/components/TopBar";
 import StructureTab from "@/components/structureTab/StructureTab";
 import BrowseTab from "@/components/browseTab/BrowseTab";
 import ExecuteTab from "@/components/executeTab/ExecuteTab";
+
 import FileDropHandler from "@/components/FileDropHandler";
+import DatabaseURLLoader from "./components/DatabaseURLLoader";
 
 import {
   CodeIcon,
@@ -13,7 +15,6 @@ import {
   LoaderCircleIcon,
   TableIcon
 } from "lucide-react";
-import DatabaseURLLoader from "./components/DatabaseURLLoader";
 
 function App() {
   const isDatabaseLoading = useDatabaseStore(

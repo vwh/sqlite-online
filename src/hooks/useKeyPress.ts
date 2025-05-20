@@ -16,13 +16,15 @@ const useKeyPress = (
       }
 
       const isCtrlPressed = event.ctrlKey || !isCtrlRequired;
-      const isKeyMatched = keys.some((key) =>
-        key === "ctrl"
-          ? false
-          : caseSensitive
-            ? key === event.key
-            : key.toLowerCase() === eventKey
-      );
+
+      const isKeyMatched = keys.some((key) => {
+        if (key === "ctrl") return false;
+        if (caseSensitive) {
+          return key === event.key;
+        } else {
+          return key.toLowerCase() === eventKey;
+        }
+      });
 
       if (isCtrlPressed && isKeyMatched) {
         event.preventDefault();
@@ -36,8 +38,6 @@ const useKeyPress = (
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [keyCombo, callback, caseSensitive]);
-
-  return;
 };
 
 export default useKeyPress;

@@ -1,7 +1,8 @@
-// components/schema/TableItem.tsx
 import { memo, useCallback } from "react";
+
 import { cn } from "@/lib/utils";
 import type { TableSchemaRow } from "@/types";
+
 import TableColumn from "./TableColumn";
 import ToggleChevron from "./common/ToggleChevron";
 
@@ -18,25 +19,15 @@ const TableItem = memo(
       () => toggleTable(name),
       [name, toggleTable]
     );
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggleTable(name);
-        }
-      },
-      [name, toggleTable]
-    );
 
     return (
       <article>
-        <div
+        <button
           className={cn(
             "flex cursor-pointer items-center rounded px-1.5 py-1 transition-all hover:ml-2",
             expanded && "ml-1"
           )}
           onClick={handleToggle}
-          onKeyDown={handleKeyDown}
           aria-expanded={expanded}
         >
           <div className="flex h-5 w-5 items-center justify-center">
@@ -48,7 +39,7 @@ const TableItem = memo(
               ({table.schema.length})
             </span>
           </span>
-        </div>
+        </button>
 
         {expanded && (
           <div className="border-primary/20 mt-1 mb-2 ml-4 flex flex-col gap-1 space-y-0.5 border-l-2 pl-2">

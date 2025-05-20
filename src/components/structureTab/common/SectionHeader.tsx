@@ -1,6 +1,7 @@
-// components/schema/common/SectionHeader.tsx
 import { memo } from "react";
+
 import { cn } from "@/lib/utils";
+
 import { Span } from "@/components/ui/span";
 import ToggleChevron from "./ToggleChevron";
 
@@ -27,6 +28,8 @@ const SectionHeader = memo(
           "hover:bg-primary/5 bg-primary/7 flex cursor-pointer items-center px-2 py-2 transition-colors",
           !expanded && "mb-0"
         )}
+        role="button"
+        tabIndex={0}
         onClick={onToggle}
         onKeyDown={handleKeyDown}
         aria-expanded={expanded}

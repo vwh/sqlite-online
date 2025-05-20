@@ -18,6 +18,8 @@ interface DatabaseWorkerProviderProps {
   children: React.ReactNode;
 }
 
+const TABLE_ROW_HEIGHT = 33;
+
 const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
   const workerRef = useRef<Worker | null>(null);
 
@@ -271,19 +273,19 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
           // 47.5 is hight of tableHeader and 33 is hight of tableRow
           // They are hardcoded because they not loaded yet
           limit = Math.floor(
-            (dataSectionHight - paginationControlsHight - 47.5) / 33
+            (dataSectionHight - paginationControlsHight - 47.5) /
+              TABLE_ROW_HEIGHT
           );
         }
-      } else {
-        if (
-          tableHeaderHight &&
-          dataSectionHight &&
-          paginationControlsHight &&
-          33 // tableCell hight
-        )
-          limit = Math.floor(
-            (dataSectionHight - tableHeaderHight - paginationControlsHight) / 33 // tableCell hight
-          );
+      } else if (
+        tableHeaderHight &&
+        dataSectionHight &&
+        paginationControlsHight
+      ) {
+        limit = Math.floor(
+          (dataSectionHight - tableHeaderHight - paginationControlsHight) /
+            TABLE_ROW_HEIGHT
+        );
       }
 
       setLimit(limit);

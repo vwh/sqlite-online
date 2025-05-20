@@ -15,14 +15,14 @@ function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: Readonly<ThemeProviderProps>) {
-  const [theme, setThemeState] = useState<Theme>(
+  const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
 
-  const setTheme = useCallback(
+  const updateTheme = useCallback(
     (newTheme: Theme) => {
       localStorage.setItem(storageKey, newTheme);
-      setThemeState(newTheme);
+      setTheme(newTheme);
     },
     [storageKey]
   );
@@ -42,7 +42,10 @@ function ThemeProvider({
     }
   }, [theme]);
 
-  const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
+  const value = useMemo(
+    () => ({ theme, setTheme: updateTheme }),
+    [theme, updateTheme]
+  );
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>

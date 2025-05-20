@@ -103,31 +103,29 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
             });
           } else {
             // Check if custom query returned results
-            // To render the table data
             if (results.length > 0) {
               // Send the custom query response to the main thread
               self.postMessage({
                 action: "customQueryComplete",
                 payload: { results }
               });
+              return;
             }
-            // If not return the table data
-            // Insert, Update, Delete, ...
-            else {
-              const [results, maxSize] = instance.getTableData(
-                currentTable,
-                limit,
-                offset,
-                filters,
-                sorters
-              );
 
-              // Send the table data response to the main thread
-              self.postMessage({
-                action: "queryComplete",
-                payload: { results, maxSize }
-              });
-            }
+            // If not, return the table data (Insert, Update, Delete, ...)
+            const [tableResults, maxSize] = instance.getTableData(
+              currentTable,
+              limit,
+              offset,
+              filters,
+              sorters
+            );
+
+            // Send the table data response to the main thread
+            self.postMessage({
+              action: "queryComplete",
+              payload: { results: tableResults, maxSize }
+            });
           }
         } catch (error) {
           // If the query throws an error

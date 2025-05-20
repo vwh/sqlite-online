@@ -10,11 +10,13 @@ interface ToggleChevronProps {
 }
 
 const ToggleChevron = memo(({ expanded, size = 4 }: ToggleChevronProps) => {
-  return expanded ? (
-    <MemoizedChevronDownIcon className={`h-${size} w-${size}`} />
-  ) : (
-    <MemoizedChevronRightIcon className={`h-${size} w-${size}`} />
-  );
+  const className = `h-${size} w-${size}`;
+
+  if (expanded) {
+    return <MemoizedChevronDownIcon className={className} />;
+  }
+
+  return <MemoizedChevronRightIcon className={className} />;
 });
 
 export default ToggleChevron;

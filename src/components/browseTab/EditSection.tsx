@@ -28,7 +28,6 @@ function EditSection() {
   const currentTable = useDatabaseStore((state) => state.currentTable);
   const columns = useDatabaseStore((state) => state.columns);
 
-  // Update formValues when isInserting or selectedRow changes
   useEffect(() => {
     if (isInserting) {
       setEditValues(columns?.map(() => "") || []);
@@ -39,7 +38,6 @@ function EditSection() {
     }
   }, [isInserting, selectedRowObject, columns, setEditValues]);
 
-  // Handle when user updates the edit inputs
   const handleEditInputChange = useCallback(
     (index: number, newValue: string) => {
       const currentEditValues = usePanelStore.getState().editValues;
@@ -55,58 +53,59 @@ function EditSection() {
 
     const schema = tablesSchema[currentTable]?.schema;
 
-    return columns.map((column, index) => (
-      <div key={column} className="border-primary/10 border shadow-sm">
-        <label
-          htmlFor={column}
-          className="bg-primary/5 border-primary/10 flex items-center gap-1 border-b p-1.5"
-        >
-          <div className="flex w-full items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <ColumnIcon columnSchema={schema[index]} />
-              <Span className="text-xs font-medium capitalize">{column}</Span>
+    return columns.map((column, index) => {
+      const columnSchema = schema[index];
+      const placeholder = columnSchema?.dflt_value || "Null";
+      const inputType = (() => {
+        const typeValue = columnSchema?.type ?? "";
+        if (isNumber(typeValue)) return "number";
+        if (isDate(typeValue)) return "date";
+        return "text";
+      })();
+
+      return (
+        <div key={column} className="border-primary/10 border shadow-sm">
+          <label
+            htmlFor={column}
+            className="bg-primary/5 border-primary/10 flex items-center gap-1 border-b p-1.5"
+          >
+            <div className="flex w-full items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <ColumnIcon columnSchema={columnSchema} />
+                <Span className="text-xs font-medium capitalize">{column}</Span>
+              </div>
+              {columnSchema.IsNullable && (
+                <span className="text-primary/50 bg-primary/5 rounded-full px-2 py-0.5 text-xs">
+                  Nullable
+                </span>
+              )}
             </div>
-            {schema[index].IsNullable && (
-              <span className="text-primary/50 bg-primary/5 rounded-full px-2 py-0.5 text-xs">
-                Nullable
-              </span>
+          </label>
+          <div className="p-1">
+            {isText(columnSchema?.type ?? "") ? (
+              <Textarea
+                id={column}
+                name={column}
+                className="border-primary/20 focus:ring-primary/30 focus:border-primary/40 rounded border text-sm text-[0.8rem]! focus:ring-1"
+                value={editValues[index] || ""}
+                onChange={(e) => handleEditInputChange(index, e.target.value)}
+                placeholder={placeholder}
+              />
+            ) : (
+              <Input
+                id={column}
+                name={column}
+                type={inputType}
+                className="border-primary/20 focus:ring-primary/30 focus:border-primary/40 h-9 rounded border text-[0.8rem]! focus:ring-1"
+                value={editValues[index] || ""}
+                onChange={(e) => handleEditInputChange(index, e.target.value)}
+                placeholder={placeholder}
+              />
             )}
           </div>
-        </label>
-        <div className="p-1">
-          {isText(schema[index]?.type ?? "") ? (
-            <Textarea
-              id={column}
-              name={column}
-              className="border-primary/20 focus:ring-primary/30 focus:border-primary/40 rounded border text-sm text-[0.8rem]! focus:ring-1"
-              value={editValues[index] || ""}
-              onChange={(e) => handleEditInputChange(index, e.target.value)}
-              placeholder={
-                tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
-              }
-            />
-          ) : (
-            <Input
-              id={column}
-              name={column}
-              type={
-                isNumber(schema[index]?.type ?? "")
-                  ? "number"
-                  : isDate(schema[index]?.type || "")
-                    ? "date"
-                    : "text"
-              }
-              className="border-primary/20 focus:ring-primary/30 focus:border-primary/40 h-9 rounded border text-[0.8rem]! focus:ring-1"
-              value={editValues[index] || ""}
-              onChange={(e) => handleEditInputChange(index, e.target.value)}
-              placeholder={
-                tablesSchema[currentTable]?.schema[index]?.dflt_value || "Null"
-              }
-            />
-          )}
         </div>
-      </div>
-    ));
+      );
+    });
   }, [columns, currentTable, tablesSchema, editValues, handleEditInputChange]);
 
   const actionButtons = useMemo(
