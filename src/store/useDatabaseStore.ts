@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { TableSchema, IndexSchema, Filters, Sorters } from "@/types";
 import type { SqlValue } from "sql.js";
 
@@ -6,26 +7,24 @@ interface DatabaseState {
   tablesSchema: TableSchema;
   indexesSchema: IndexSchema[];
   currentTable: string | null;
-
   data: SqlValue[][] | null;
   columns: string[] | null;
   maxSize: number;
-
   isDatabaseLoading: boolean;
   isDataLoading: boolean;
   errorMessage: string | null;
-
   filters: Filters;
   sorters: Sorters;
   limit: number;
   offset: number;
-
   customQuery?: string;
   customQueryObject: {
     data: SqlValue[][];
     columns: string[];
   } | null;
+}
 
+interface DatabaseActions {
   setTablesSchema: (schema: TableSchema) => void;
   setIndexesSchema: (schema: IndexSchema[]) => void;
   setCurrentTable: (table: string | null) => void;
@@ -39,16 +38,17 @@ interface DatabaseState {
   setSorters: (sorters: Sorters) => void;
   setLimit: (limit: number) => void;
   setOffset: (offset: number) => void;
-
   setCustomQuery: (query: string) => void;
   setCustomQueryObject: (
     obj: { data: SqlValue[][]; columns: string[] } | null
   ) => void;
-
   resetPagination: () => void;
 }
 
-export const useDatabaseStore = create<DatabaseState>((set) => ({
+type DatabaseStore = DatabaseState & DatabaseActions;
+
+export const useDatabaseStore = create<DatabaseStore>((set) => ({
+  // --- State ---
   tablesSchema: {} as TableSchema,
   indexesSchema: [],
   currentTable: null,
@@ -62,29 +62,24 @@ export const useDatabaseStore = create<DatabaseState>((set) => ({
   sorters: null,
   limit: 50,
   offset: 0,
-
   customQuery: undefined,
   customQueryObject: null,
 
-  setTablesSchema: (schema: TableSchema) => set({ tablesSchema: schema }),
-  setIndexesSchema: (schema: IndexSchema[]) => set({ indexesSchema: schema }),
-  setCurrentTable: (table: string | null) => set({ currentTable: table }),
-  setData: (data: SqlValue[][] | null) => set({ data }),
-  setColumns: (columns: string[] | null) => set({ columns }),
-  setMaxSize: (maxSize: number) => set({ maxSize }),
-  setIsDatabaseLoading: (isDatabaseLoading: boolean) =>
-    set({ isDatabaseLoading }),
-  setIsDataLoading: (isDataLoading: boolean) => set({ isDataLoading }),
-  setErrorMessage: (errorMessage: string | null) => set({ errorMessage }),
-  setFilters: (filters: Filters) => set({ filters }),
-  setSorters: (sorters: Sorters) => set({ sorters }),
-  setLimit: (limit: number) => set({ limit }),
-  setOffset: (offset: number) => set({ offset }),
-
-  setCustomQuery: (query: string) => set({ customQuery: query }),
-  setCustomQueryObject: (
-    customQueryObject: { data: SqlValue[][]; columns: string[] } | null
-  ) => set({ customQueryObject }),
-
+  // --- Actions ---
+  setTablesSchema: (schema) => set({ tablesSchema: schema }),
+  setIndexesSchema: (schema) => set({ indexesSchema: schema }),
+  setCurrentTable: (table) => set({ currentTable: table }),
+  setData: (data) => set({ data }),
+  setColumns: (columns) => set({ columns }),
+  setMaxSize: (size) => set({ maxSize: size }),
+  setIsDatabaseLoading: (loading) => set({ isDatabaseLoading: loading }),
+  setIsDataLoading: (loading) => set({ isDataLoading: loading }),
+  setErrorMessage: (message) => set({ errorMessage: message }),
+  setFilters: (filters) => set({ filters }),
+  setSorters: (sorters) => set({ sorters }),
+  setLimit: (limit) => set({ limit }),
+  setOffset: (offset) => set({ offset }),
+  setCustomQuery: (query) => set({ customQuery: query }),
+  setCustomQueryObject: (obj) => set({ customQueryObject: obj }),
   resetPagination: () => set({ offset: 0 })
 }));
