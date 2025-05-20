@@ -23,7 +23,6 @@ const TABLE_ROW_HEIGHT = 33;
 const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
   const workerRef = useRef<Worker | null>(null);
 
-  // Database Store
   const setTablesSchema = useDatabaseStore((state) => state.setTablesSchema);
   const setIndexesSchema = useDatabaseStore((state) => state.setIndexesSchema);
   const setCurrentTable = useDatabaseStore((state) => state.setCurrentTable);
@@ -417,7 +416,6 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
         return;
       }
 
-      // use currentOffset instead of prev
       if (typeof type === "number") {
         setOffset(type);
       } else if (type === "next") {

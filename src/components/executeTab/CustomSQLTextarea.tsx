@@ -179,7 +179,6 @@ function CustomSQLTextarea() {
     return { tableNames, columnNames };
   }, [tablesSchema]);
 
-  // Compute completion options directly with useMemo
   const completionOptions = useMemo(() => {
     return [
       ...SQLITE_KEYWORDS.map((keyword) => ({

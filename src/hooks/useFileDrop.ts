@@ -65,7 +65,6 @@ const useFileDrop = () => {
     [handleFileUpload]
   );
 
-  // Add event listeners
   useEffect(() => {
     window.addEventListener("dragover", handleDragOver);
     window.addEventListener("dragleave", handleDragLeave);

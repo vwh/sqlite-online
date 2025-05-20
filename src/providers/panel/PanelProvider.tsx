@@ -17,7 +17,6 @@ const PanelProvider = ({ children }: PanelProviderProps) => {
   } | null>(null);
   const [isInserting, setIsInserting] = useState(false);
 
-  // Detect if in editing mode (insert or update/delete)
   const isEditing = selectedRowObject !== null || isInserting;
 
   // Handle row click to toggle edit panel

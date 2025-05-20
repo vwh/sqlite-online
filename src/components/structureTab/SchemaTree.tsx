@@ -10,7 +10,7 @@ import SchemaSearch from "./SchemaSearch";
 
 const SchemaTree = () => {
   const [filter, setFilter] = useState("");
-  const [expandedTableSection, setExpandedTableSection] = useState(true); // local state only
+  const [expandedTableSection, setExpandedTableSection] = useState(true);
 
   const expandedIndexSection = useSchemaStore(
     (state) => state.expandedIndexSection
