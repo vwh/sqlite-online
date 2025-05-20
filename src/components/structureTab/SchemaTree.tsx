@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useDatabaseStore } from "@/store/useDatabaseStore";
+import { useSchemaStore } from "@/store/useSchemaStore";
 
 import type { TableSchema } from "@/types";
 
@@ -9,50 +10,48 @@ import SchemaSearch from "./SchemaSearch";
 
 const SchemaTree = () => {
   const [filter, setFilter] = useState("");
+  const [expandedTableSection, setExpandedTableSection] = useState(true); // local state only
+
+  const expandedIndexSection = useSchemaStore(
+    (state) => state.expandedIndexSection
+  );
+  const toggleExpandedIndexSection = useSchemaStore(
+    (state) => state.toggleExpandedIndexSection
+  );
+
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
   const indexesSchema = useDatabaseStore((state) => state.indexesSchema);
 
-  const [expandedTables, setExpandedTables] = useState<string[]>([]);
-  const [expandedTableSection, setExpandedTableSection] = useState(true);
-  const [expandedIndexSection, setExpandedIndexSection] = useState(true);
-
-  const toggleTable = useCallback((tableName: string) => {
-    setExpandedTables((prevExpanded) =>
-      prevExpanded.includes(tableName)
-        ? prevExpanded.filter((name) => name !== tableName)
-        : [...prevExpanded, tableName]
-    );
-  }, []);
+  const expandedTables = useSchemaStore((state) => state.expandedTables);
+  const toggleTable = useSchemaStore((state) => state.toggleTable);
+  const setExpandedTables = useSchemaStore((state) => state.setExpandedTables);
 
   const toggleTableSection = useCallback(() => {
     setExpandedTableSection((prev) => !prev);
   }, []);
 
-  const toggleIndexSection = useCallback(() => {
-    setExpandedIndexSection((prev) => !prev);
-  }, []);
-
-  const expandAllTables = useCallback((tablesSchema: TableSchema) => {
-    setExpandedTables(Object.keys(tablesSchema));
-    setExpandedTableSection(true);
-  }, []);
+  const expandAllTables = useCallback(
+    (tablesSchema: TableSchema) => {
+      setExpandedTables(Object.keys(tablesSchema));
+      setExpandedTableSection(true);
+    },
+    [setExpandedTables]
+  );
 
   const collapseAllTables = useCallback(() => {
     setExpandedTables([]);
     setExpandedTableSection(false);
-  }, []);
+  }, [setExpandedTables]);
 
   const filteredTables = useMemo(() => {
     if (!filter) return tablesSchema;
 
     const filtered: TableSchema = {};
-
     for (const [tableName, tableData] of Object.entries(tablesSchema)) {
       if (tableName.toLowerCase().includes(filter.toLowerCase())) {
         filtered[tableName] = tableData;
       }
     }
-
     return filtered;
   }, [tablesSchema, filter]);
 
@@ -85,7 +84,7 @@ const SchemaTree = () => {
           <IndexesSection
             indexes={filteredIndexes}
             expandedIndexSection={expandedIndexSection}
-            toggleIndexSection={toggleIndexSection}
+            toggleIndexSection={toggleExpandedIndexSection}
           />
         )}
       </nav>
