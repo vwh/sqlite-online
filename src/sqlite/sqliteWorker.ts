@@ -48,6 +48,10 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
       case "openFile": {
         instance = await Sqlite.open(new Uint8Array(payload.file));
 
+        if (instance.firstTable === null) {
+          throw new Error("Database is empty");
+        }
+
         // Send the initialization response to the main thread
         self.postMessage({
           action: "initComplete",
