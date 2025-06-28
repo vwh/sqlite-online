@@ -8,6 +8,7 @@ import viteImagemin from "vite-plugin-imagemin";
 import babelReactCompiler from "babel-plugin-react-compiler";
 
 export default defineConfig({
+  base: "/sqlite-online/",
   plugins: [
     react({
       babel: {
