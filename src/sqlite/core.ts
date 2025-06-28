@@ -35,7 +35,7 @@ export default class Sqlite {
   private static async initSQLjs(): Promise<SqlJsStatic> {
     if (Sqlite.sqlJsStatic) return Sqlite.sqlJsStatic;
     return await initSqlJs({
-      locateFile: (file) => `/wasm/${file}`
+      locateFile: (file) => `${import.meta.env.BASE_URL}wasm/${file}`
     });
   }
 
