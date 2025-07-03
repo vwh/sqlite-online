@@ -89,7 +89,7 @@ function PaginationControls() {
           variant="outline"
           className="h-8 text-xs font-medium shadow-sm"
           onClick={handleInsert}
-          disabled={isInserting || !maxSize}
+          disabled={isInserting}
         >
           <PlusIcon className="mr-2 h-3.5 w-3.5" />
           Insert row
