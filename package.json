@@ -51,7 +51,7 @@
     "@types/react-dom": "^19.0.4",
     "@types/react-window": "^1.8.8",
     "@types/sql.js": "^1.4.9",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^4.6.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-e993439-20250328",
     "eslint": "^9.21.0",
     "eslint-plugin-react-compiler": "^19.0.0-beta-e993439-20250328",
