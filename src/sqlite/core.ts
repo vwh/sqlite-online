@@ -32,7 +32,7 @@ export default class Sqlite {
   }
 
   // Initialize SQL.js
-  
+
   private static async initSQLjs(): Promise<SqlJsStatic> {
     if (Sqlite.sqlJsStatic) return Sqlite.sqlJsStatic;
     return await initSqlJs({
