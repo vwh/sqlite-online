@@ -7,8 +7,12 @@ import compression from "vite-plugin-compression";
 import viteImagemin from "vite-plugin-imagemin";
 import babelReactCompiler from "babel-plugin-react-compiler";
 
-export default defineConfig({
-  base: "./",
+export default defineConfig(({ mode }) => {
+  const isPages = mode === 'pages';
+  console.log('Mode:', mode);
+  
+  return {
+  base: isPages ? '/sqlite-online/' : '/',
   plugins: [
     react({
       babel: {
@@ -71,4 +75,5 @@ export default defineConfig({
       strict: false
     }
   }
-});
+}
+})

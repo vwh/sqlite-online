@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "build:pages": "tsc -b && vite build --mode pages",
+    "preview:pages": "vite preview --mode pages",
+    "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
     "format:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx}'",
-    "preview": "vite preview",
-    "knip": "knip",
-    "deploy": "gh-pages -d dist"
+    "knip": "knip"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.6",
