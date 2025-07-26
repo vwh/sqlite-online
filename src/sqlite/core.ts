@@ -32,6 +32,7 @@ export default class Sqlite {
   }
 
   // Initialize SQL.js
+
   private static async initSQLjs(): Promise<SqlJsStatic> {
     if (Sqlite.sqlJsStatic) return Sqlite.sqlJsStatic;
     return await initSqlJs({
@@ -156,7 +157,7 @@ export default class Sqlite {
   // Used for pagination
   private getMaxSizeOfTable(tableName: string, filters?: Filters) {
     const [results] = this.exec(`
-      SELECT COUNT(*) FROM "${tableName}" 
+      SELECT COUNT(*) FROM "${tableName}"
       ${buildWhereClause(filters)}
     `);
 
@@ -175,9 +176,9 @@ export default class Sqlite {
     sorters?: Sorters
   ) {
     const [results] = this.exec(`
-      SELECT ${this.tablesSchema[table].primaryKey}, * FROM "${table}" 
-      ${buildWhereClause(filters)} 
-      ${buildOrderByClause(sorters)} 
+      SELECT ${this.tablesSchema[table].primaryKey}, * FROM "${table}"
+      ${buildWhereClause(filters)}
+      ${buildOrderByClause(sorters)}
       LIMIT ${limit} OFFSET ${offset}
     `);
 
