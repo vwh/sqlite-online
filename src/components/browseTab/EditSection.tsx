@@ -117,6 +117,7 @@ function EditSection() {
           className="w-full py-2 text-xs font-medium"
           onClick={() => handleEditSubmit(isInserting ? "insert" : "update")}
           aria-label={isInserting ? "Insert row" : "Apply changes"}
+          disabled={tablesSchema[currentTable!]?.type === "view"}
         >
           {isInserting ? (
             <>
@@ -137,13 +138,14 @@ function EditSection() {
             className="hover:bg-destructive/50 rounded text-xs"
             onClick={() => handleEditSubmit("delete")}
             aria-label="Delete row"
+            disabled={tablesSchema[currentTable!]?.type === "view"}
           >
             <Trash2Icon className="h-3.5 w-3.5" />
           </Button>
         )}
       </div>
     ),
-    [handleEditSubmit, isInserting]
+    [handleEditSubmit, isInserting, currentTable, tablesSchema]
   );
 
   const sectionHeader = useMemo(

@@ -5,10 +5,11 @@ import type { TableSchemaRow } from "@/types";
 
 import TableColumn from "./TableColumn";
 import ToggleChevron from "./common/ToggleChevron";
+import { EyeIcon } from "lucide-react";
 
 interface TableItemProps {
   name: string;
-  table: { schema: TableSchemaRow[] };
+  table: { schema: TableSchemaRow[]; type: "table" | "view" };
   expanded: boolean;
   toggleTable: (tableName: string) => void;
 }
@@ -34,6 +35,7 @@ const TableItem = memo(
             <ToggleChevron expanded={expanded} />
           </div>
           <span className="flex items-center gap-1 capitalize">
+            {table.type === "view" && <EyeIcon className="h-4 w-4" />}
             <span className="text-sm">{name}</span>
             <span className="text-primary/50 text-xs">
               ({table.schema.length})

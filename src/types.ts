@@ -2,8 +2,9 @@ import type { QueryExecResult, SqlValue } from "sql.js";
 
 export type TableSchema = {
   [tableName: string]: {
-    primaryKey: "_rowid_" | string;
+    primaryKey: "_rowid_" | string | null;
     schema: TableSchemaRow[];
+    type: "table" | "view";
   };
 };
 

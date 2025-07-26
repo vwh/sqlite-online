@@ -110,11 +110,15 @@ function DataTable() {
       <TableBody>
         {data && data.length > 0 ? (
           data.map((row, i) => {
-            const displayData = row.slice(1);
+            const isView = tablesSchema[currentTable!]?.type === "view";
+            const primaryKey = tablesSchema[currentTable!]?.primaryKey;
+            const primaryValue = primaryKey && !isView ? row[0] : null;
+            const displayData = primaryKey && !isView ? row.slice(1) : row;
+
             return (
               <TableRow
                 key={i}
-                onClick={() => handleRowClick(displayData, i, row[0])}
+                onClick={() => handleRowClick(displayData, i, primaryValue)}
                 className="hover:bg-primary/5 focus:bg-primary/5 cursor-pointer text-xs"
               >
                 {displayData.map((value, j) => (

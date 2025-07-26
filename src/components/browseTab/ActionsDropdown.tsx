@@ -1,4 +1,5 @@
 import usePanelManager from "@/hooks/usePanel";
+import { useDatabaseStore } from "@/store/useDatabaseStore";
 
 import type { exportTypes, Filters, Sorters } from "@/types";
 
@@ -34,6 +35,9 @@ function ActionsDropdown({
   handleExport
 }: Readonly<ActionDropdownProps>) {
   const { isInserting, handleInsert } = usePanelManager();
+  const isView = useDatabaseStore(
+    (state) => state.tablesSchema[state.currentTable!]?.type === "view"
+  );
 
   return (
     <DropdownMenu>
@@ -75,7 +79,7 @@ function ActionsDropdown({
             size="sm"
             className="h-8 w-full justify-start text-xs"
             onClick={handleInsert}
-            disabled={isInserting}
+            disabled={isInserting || isView}
             title="Insert a new row"
           >
             <PlusIcon className="mr-1 h-3 w-3" />

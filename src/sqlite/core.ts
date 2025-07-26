@@ -134,13 +134,14 @@ export default class Sqlite {
 
     for (const row of results[0].values) {
       const [type, name, tableName] = row;
-      if (type === "table") {
+      if (type === "table" || type === "view") {
         const [tableSchema, primaryKey] = this.getTableInfo(
           tableName as string
         );
         this.tablesSchema[tableName as string] = {
           schema: tableSchema,
-          primaryKey
+          primaryKey: type === "view" ? null : primaryKey,
+          type: type as "table" | "view"
         };
       } else if (type === "index") {
         this.indexesSchema.push({
@@ -175,8 +176,11 @@ export default class Sqlite {
     filters?: Filters,
     sorters?: Sorters
   ) {
+    const primaryKey = this.getPrimaryKey(table);
+    const selectClause = primaryKey ? `${primaryKey}, *` : "*";
+
     const [results] = this.exec(`
-      SELECT ${this.tablesSchema[table].primaryKey}, * FROM "${table}"
+      SELECT ${selectClause} FROM "${table}"
       ${buildWhereClause(filters)}
       ${buildOrderByClause(sorters)}
       LIMIT ${limit} OFFSET ${offset}
@@ -190,7 +194,7 @@ export default class Sqlite {
   }
 
   // Get the primary key of a table
-  private getPrimaryKey(table: string): string {
+  private getPrimaryKey(table: string): string | null {
     const tableSchema = this.tablesSchema[table];
     if (!tableSchema) {
       throw new Error(`Table "${table}" not found.`);
@@ -208,6 +212,11 @@ export default class Sqlite {
   ) {
     try {
       const primaryKey = this.getPrimaryKey(table);
+      if (!primaryKey) {
+        throw new Error(
+          `Table or view "${table}" does not have a primary key and cannot be updated.`
+        );
+      }
 
       // Construct the SET clause
       const setClause = columns.map((column) => `"${column}" = ?`).join(", ");
@@ -237,6 +246,12 @@ export default class Sqlite {
   public delete(table: string, id: SqlValue) {
     try {
       const primaryKey = this.getPrimaryKey(table);
+      if (!primaryKey) {
+        throw new Error(
+          `Table or view "${table}" does not have a primary key and cannot be deleted from.`
+        );
+      }
+
       const query = `DELETE FROM "${table}" WHERE "${primaryKey}" = ?`;
 
       const stmt = this.db.prepare(query);

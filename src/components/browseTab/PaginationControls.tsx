@@ -20,6 +20,9 @@ function PaginationControls() {
   const limit = useDatabaseStore((state) => state.limit);
   const maxSize = useDatabaseStore((state) => state.maxSize);
   const isDataLoading = useDatabaseStore((state) => state.isDataLoading);
+  const isView = useDatabaseStore(
+    (state) => state.tablesSchema[state.currentTable!]?.type === "view"
+  );
 
   return (
     <footer
@@ -89,7 +92,7 @@ function PaginationControls() {
           variant="outline"
           className="h-8 text-xs font-medium shadow-sm"
           onClick={handleInsert}
-          disabled={isInserting}
+          disabled={isInserting || isView}
         >
           <PlusIcon className="mr-2 h-3.5 w-3.5" />
           Insert row
