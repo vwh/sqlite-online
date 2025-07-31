@@ -78,6 +78,8 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
 
       // When the worker is initialized
       if (action === "initComplete") {
+        window.parent.postMessage({ type: "loadDatabaseBufferReady" }, "*");
+
         const { payload } = workerEvent;
 
         setTablesSchema(payload.tableSchema);
@@ -316,7 +318,6 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
 
   useEffect(() => {
     window.loadDatabaseBuffer = loadDatabaseBuffer;
-    window.parent.postMessage({ type: "loadDatabaseBufferReady" }, "*");
     const handleMessage = async (event: MessageEvent) => {
       if (event.data.type === "invokeLoadDatabaseBuffer") {
         try {
