@@ -106,7 +106,7 @@ export default class Sqlite {
           cid: cid as number,
           type: (type as string) || "Unknown",
           dflt_value: dflt_value as string,
-          IsNullable: (notnull as number) === 0,
+          IsNullable: (notnull as number) === 0 && pk === 0,
           isPrimaryKey: (pk as number) === 1,
           isForeignKey: foreignKeys[name as string] ?? false
         });
