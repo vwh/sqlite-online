@@ -307,6 +307,41 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
     setIsDataLoading
   ]);
 
+  const loadDatabaseBuffer = useCallback(async (buffer: ArrayBuffer) => {
+    workerRef.current?.postMessage({
+      action: "openFile",
+      payload: { file: buffer }
+    });
+  }, []);
+
+  useEffect(() => {
+    window.loadDatabaseBuffer = loadDatabaseBuffer;
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data.type === "invokeLoadDatabaseBuffer") {
+        try {
+          const buffer = event.data.buffer;
+          await loadDatabaseBuffer(buffer); // Invoke the function
+          event.source?.postMessage(
+            { type: "loadDatabaseBufferSuccess" },
+            event.origin as WindowPostMessageOptions
+          );
+        } catch (error: unknown) {
+          event.source?.postMessage(
+            {
+              type: "loadDatabaseBufferError",
+              error: (error as Error)?.message
+            },
+            event.origin as WindowPostMessageOptions
+          );
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [loadDatabaseBuffer]);
+
   // Handle file upload
   const handleFileUpload = useCallback((file: File) => {
     showToast("Opening database", "info");
