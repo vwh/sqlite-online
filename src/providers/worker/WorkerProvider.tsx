@@ -316,6 +316,7 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
 
   useEffect(() => {
     window.loadDatabaseBuffer = loadDatabaseBuffer;
+    window.parent.postMessage({ type: "loadDatabaseBufferReady" }, "*");
     const handleMessage = async (event: MessageEvent) => {
       if (event.data.type === "invokeLoadDatabaseBuffer") {
         try {
