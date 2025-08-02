@@ -22,6 +22,8 @@ interface DatabaseState {
     data: SqlValue[][];
     columns: string[];
   } | null;
+  geminiApiKey: string | null;
+  isAiLoading: boolean;
 }
 
 interface DatabaseActions {
@@ -42,6 +44,8 @@ interface DatabaseActions {
   setCustomQueryObject: (
     obj: { data: SqlValue[][]; columns: string[] } | null
   ) => void;
+  setGeminiApiKey: (key: string | null) => void;
+  setIsAiLoading: (loading: boolean) => void;
   resetPagination: () => void;
 }
 
@@ -64,6 +68,9 @@ export const useDatabaseStore = create<DatabaseStore>((set) => ({
   offset: 0,
   customQuery: undefined,
   customQueryObject: null,
+  geminiApiKey:
+    typeof window !== "undefined" ? localStorage.getItem("geminiApiKey") : null,
+  isAiLoading: false,
 
   // --- Actions ---
   setTablesSchema: (schema) => set({ tablesSchema: schema }),
@@ -81,5 +88,14 @@ export const useDatabaseStore = create<DatabaseStore>((set) => ({
   setOffset: (offset) => set({ offset }),
   setCustomQuery: (query) => set({ customQuery: query }),
   setCustomQueryObject: (obj) => set({ customQueryObject: obj }),
+  setGeminiApiKey: (key) => {
+    set({ geminiApiKey: key });
+    if (key) {
+      localStorage.setItem("geminiApiKey", key);
+    } else {
+      localStorage.removeItem("geminiApiKey");
+    }
+  },
+  setIsAiLoading: (loading) => set({ isAiLoading: loading }),
   resetPagination: () => set({ offset: 0 })
 }));

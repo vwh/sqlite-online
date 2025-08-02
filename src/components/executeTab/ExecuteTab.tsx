@@ -1,8 +1,9 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { useDatabaseStore } from "@/store/useDatabaseStore";
 import { usePanelStore } from "@/store/usePanelStore";
 import useDatabaseWorker from "@/hooks/useWorker";
+import { useGeminiAI } from "@/hooks/useGeminiAI";
 
 import {
   ResizableHandle,
@@ -13,12 +14,14 @@ import { Button } from "@/components/ui/button";
 import SchemaTree from "@/components/structureTab/SchemaTree";
 import CustomSQLTextarea from "./CustomSQLTextarea";
 import CustomQueryDataTable from "./CustomQueryDataTable";
+import ApiKeyModal from "./ApiKeyModal";
 
 import {
   PlayIcon,
   LoaderCircleIcon,
   XIcon,
-  FolderOutputIcon
+  FolderOutputIcon,
+  SparklesIcon
 } from "lucide-react";
 
 function ExecuteTab() {
@@ -33,15 +36,31 @@ function ExecuteTab() {
   const schemaPanelSize = usePanelStore((state) => state.schemaPanelSize);
   const setDataPanelSize = usePanelStore((state) => state.setDataPanelSize);
   const setSchemaPanelSize = usePanelStore((state) => state.setSchemaPanelSize);
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+
   const customQueryObject = useDatabaseStore(
     (state) => state.customQueryObject
   );
+  const customQuery = useDatabaseStore((state) => state.customQuery);
 
   const { handleQueryExecute, handleExport } = useDatabaseWorker();
+  const { generateSqlQuery, isAiLoading } = useGeminiAI();
+
+  const handleExecuteClick = () => {
+    if (customQuery && customQuery.startsWith("/ai ")) {
+      generateSqlQuery();
+    } else {
+      handleQueryExecute();
+    }
+  };
 
   const handleErrorClose = useCallback(() => {
     setErrorMessage(null);
   }, [setErrorMessage]);
+
+  const handleApiKeyModalOpen = () => {
+    setIsApiKeyModalOpen(true);
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -50,10 +69,15 @@ function ExecuteTab() {
           size="sm"
           variant="outline"
           className="w-[150px] text-xs"
-          onClick={handleQueryExecute}
+          onClick={handleExecuteClick}
+          disabled={isAiLoading}
           title="Execute SQL"
         >
-          <PlayIcon className="mr-1 h-3 w-3" />
+          {isAiLoading ? (
+            <LoaderCircleIcon className="mr-1 h-3 w-3 animate-spin" />
+          ) : (
+            <PlayIcon className="mr-1 h-3 w-3" />
+          )}
           Execute SQL
         </Button>
 
@@ -66,6 +90,15 @@ function ExecuteTab() {
         >
           <FolderOutputIcon className="mr-1 h-3 w-3" />
           Export data
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="text-xs"
+          onClick={handleApiKeyModalOpen}
+        >
+          <SparklesIcon className="mr-1 h-3 w-3" />
+          Gemini
         </Button>
         {(isDataLoading || isDatabaseLoading) && (
           <span className="ml-2 flex items-center text-xs text-gray-500">
@@ -122,6 +155,10 @@ function ExecuteTab() {
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
+        <ApiKeyModal
+          isOpen={isApiKeyModalOpen}
+          onClose={() => setIsApiKeyModalOpen(false)}
+        />
       </div>
     </div>
   );

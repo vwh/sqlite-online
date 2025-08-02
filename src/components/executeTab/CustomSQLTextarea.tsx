@@ -213,7 +213,6 @@ function CustomSQLTextarea() {
     [completionOptions]
   );
 
-  // Handle changes in the editor and update state if needed
   const handleChange = useCallback(
     (newValue: string) => {
       if (newValue !== customQuery) {
@@ -223,10 +222,13 @@ function CustomSQLTextarea() {
     [customQuery, setCustomQuery]
   );
 
-  const extensions = useMemo(
-    () => [SQLite, sql(), autocompletion({ override: [myCompletions] })],
-    [myCompletions]
-  );
+  const extensions = useMemo(() => {
+    if (customQuery && customQuery.startsWith("/ai ")) {
+      return [autocompletion({ override: [myCompletions] })];
+    } else {
+      return [SQLite, sql(), autocompletion({ override: [myCompletions] })];
+    }
+  }, [myCompletions, customQuery]);
 
   return (
     <CodeMirror
