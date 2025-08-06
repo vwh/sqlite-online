@@ -83,6 +83,16 @@
   --ring: oklch(100% 0 0);
 }
 
+/* Hide scrollbar for synchronized header */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .dark {
   --background: oklch(20.02% 0 0);
   --foreground: oklch(0.985 0 0);

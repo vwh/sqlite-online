@@ -1,6 +1,7 @@
 import { useDatabaseStore } from "@/store/useDatabaseStore";
+import { useRef, useCallback, useEffect, useMemo } from "react";
 
-import { FixedSizeList as List } from "react-window";
+import { VariableSizeGrid as Grid } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
 import { Span } from "@/components/ui/span";
@@ -9,11 +10,89 @@ import Badge from "@/components/ui/badge";
 import { DatabaseIcon, TableIcon } from "lucide-react";
 
 const ROW_HEIGHT = 36;
+const MIN_COLUMN_WIDTH = 120;
 
 function CustomQueryDataTable() {
   const customQueryObject = useDatabaseStore(
     (state) => state.customQueryObject
   );
+
+  const headerScrollRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<Grid>(null);
+
+  // Memoize column widths calculation to reset when query changes
+  const columnWidths = useMemo(() => {
+    if (!customQueryObject) return [];
+
+    return customQueryObject.columns.map((column, columnIndex) => {
+      const maxContentLength = Math.max(
+        column.length,
+        ...customQueryObject.data.slice(0, 100).map(row =>
+          String(row[columnIndex] || '').length
+        )
+      );
+      return Math.max(MIN_COLUMN_WIDTH, Math.min(maxContentLength * 8 + 32, 300));
+    });
+  }, [customQueryObject]);
+
+  // Calculate column widths based on content and available space
+  const getColumnWidth = useCallback((columnIndex: number, containerWidth?: number) => {
+    if (!customQueryObject || !columnWidths[columnIndex]) return MIN_COLUMN_WIDTH;
+
+    const contentBasedWidth = columnWidths[columnIndex];
+
+    // If we have container width, ensure table fills the full width
+    if (containerWidth) {
+      const totalContentWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+
+      // If content width is less than container, distribute extra space
+      if (totalContentWidth < containerWidth) {
+        const extraSpace = containerWidth - totalContentWidth;
+        const extraPerColumn = extraSpace / customQueryObject.columns.length;
+        return contentBasedWidth + extraPerColumn;
+      }
+    }
+
+    return contentBasedWidth;
+  }, [customQueryObject, columnWidths]);
+
+  const getRowHeight = useCallback(() => ROW_HEIGHT, []);
+
+  // Synchronize horizontal scrolling between header and grid
+  const handleGridScroll = useCallback(({ scrollLeft }: { scrollLeft: number }) => {
+    if (headerScrollRef.current) {
+      headerScrollRef.current.scrollLeft = scrollLeft;
+    }
+  }, []);
+
+  const getTotalWidth = useCallback((containerWidth: number) => {
+    if (!customQueryObject || !columnWidths.length) return containerWidth;
+
+    const totalContentWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+    return Math.max(totalContentWidth, containerWidth);
+  }, [customQueryObject, columnWidths]);
+
+  // Reset grid cache when query changes to handle resize properly
+  useEffect(() => {
+    if (gridRef.current) {
+      gridRef.current.resetAfterColumnIndex(0);
+    }
+  }, [customQueryObject]);
+
+  // Store current width to detect changes
+  const currentWidthRef = useRef<number>(0);
+
+  const handleResize = useCallback((width: number) => {
+    if (currentWidthRef.current !== width && gridRef.current) {
+      currentWidthRef.current = width;
+      // Small delay to ensure the grid has updated
+      setTimeout(() => {
+        if (gridRef.current) {
+          gridRef.current.resetAfterColumnIndex(0);
+        }
+      }, 0);
+    }
+  }, []);
 
   if (!customQueryObject) {
     return (
@@ -79,75 +158,74 @@ function CustomQueryDataTable() {
 
       <div className="h-0 min-h-0 flex-grow overflow-hidden">
         <AutoSizer>
-          {({ height, width }) => (
-            <div style={{ height, width }}>
-              {/* Table Header */}
-              <div
-                className="bg-primary/5 sticky top-0 z-10 flex border-b"
-                style={{ width }}
-              >
-                {customQueryObject.columns.map((column) => {
-                  const columnWidth = 100 / customQueryObject.columns.length;
-                  return (
-                    <div
-                      key={column}
-                      className="p-2 text-xs font-medium text-ellipsis whitespace-nowrap"
-                      style={{
-                        width: `${columnWidth}%`,
+          {({ height, width }) => {
+            const tableWidth = getTotalWidth(width);
 
-                        flexShrink: 0
-                      }}
-                    >
-                      <Span className="text-foreground capitalize">
-                        {column}
-                      </Span>
-                    </div>
-                  );
-                })}
+            // Handle resize
+            handleResize(width);
+
+            return (
+              <div style={{ height, width }} className="flex flex-col">
+                {/* Fixed Header with Horizontal Scroll */}
+                <div
+                  ref={headerScrollRef}
+                  className="bg-primary/5 border-b overflow-x-auto overflow-y-hidden scrollbar-hide"
+                  style={{
+                    height: ROW_HEIGHT,
+                    width: width
+                  }}
+                >
+                  <div
+                    className="flex"
+                    style={{ width: tableWidth }}
+                  >
+                    {customQueryObject.columns.map((column, columnIndex) => (
+                      <div
+                        key={`${column}-${columnIndex}`}
+                        className="p-2 text-xs font-medium border-r border-primary/10 flex-shrink-0 flex items-center"
+                        style={{ width: getColumnWidth(columnIndex, width) }}
+                      >
+                        <Span className="text-foreground capitalize truncate">
+                          {column}
+                        </Span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Virtualized Grid Body */}
+                <Grid
+                  ref={gridRef}
+                  height={height - ROW_HEIGHT}
+                  width={width}
+                  columnCount={customQueryObject.columns.length}
+                  rowCount={customQueryObject.data.length}
+                  columnWidth={(index) => getColumnWidth(index, width)}
+                  rowHeight={getRowHeight}
+                  onScroll={handleGridScroll}
+                  overscanColumnCount={2}
+                  overscanRowCount={5}
+                  key={`grid-${customQueryObject.columns.join('-')}`}
+                >
+                  {({ columnIndex, rowIndex, style }) => {
+                    const value = customQueryObject.data[rowIndex][columnIndex];
+                    return (
+                      <div
+                        style={style}
+                        className="border-primary/5 border-t border-r p-2 flex items-center hover:bg-primary/5"
+                      >
+                        {value !== null ? (
+                          <Span className="text-xs truncate">{String(value)}</Span>
+                        ) : (
+                          <Badge>NULL</Badge>
+                        )}
+                      </div>
+                    );
+                  }}
+                </Grid>
               </div>
-
-              {/* Virtualized Rows */}
-              <List
-                height={height - ROW_HEIGHT}
-                width={width}
-                itemCount={customQueryObject.data.length}
-                itemSize={ROW_HEIGHT}
-                overscanCount={5}
-              >
-                {({ index, style }) => {
-                  const row = customQueryObject.data[index];
-                  return (
-                    <div
-                      style={{ ...style, display: "flex", width }}
-                      key={index}
-                    >
-                      {row.map((value, cellIndex) => {
-                        const columnWidth =
-                          100 / customQueryObject.columns.length;
-                        return (
-                          <div
-                            key={cellIndex}
-                            className="border-primary/5 overflow-hidden border-t p-2 text-ellipsis whitespace-nowrap"
-                            style={{
-                              width: `${columnWidth}%`,
-                              minWidth: "100px",
-                              flexShrink: 0
-                            }}
-                          >
-                            {value !== null ? (
-                              <Span className="text-xs">{String(value)}</Span>
-                            ) : (
-                              <Badge>NULL</Badge>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                }}
-              </List>
-            </div>
-          )}
+            );
+          }}
         </AutoSizer>
       </div>
     </div>
