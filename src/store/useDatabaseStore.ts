@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 import type { TableSchema, IndexSchema, Filters, Sorters } from "@/types";
 import type { SqlValue } from "sql.js";
+import SecureStorage from "@/lib/secureStorage";
 
 interface DatabaseState {
   tablesSchema: TableSchema;
@@ -44,9 +45,10 @@ interface DatabaseActions {
   setCustomQueryObject: (
     obj: { data: SqlValue[][]; columns: string[] } | null
   ) => void;
-  setGeminiApiKey: (key: string | null) => void;
+  setGeminiApiKey: (key: string | null) => Promise<void>;
   setIsAiLoading: (loading: boolean) => void;
   resetPagination: () => void;
+  initializeApiKey: () => Promise<void>;
 }
 
 type DatabaseStore = DatabaseState & DatabaseActions;
@@ -68,8 +70,7 @@ export const useDatabaseStore = create<DatabaseStore>((set) => ({
   offset: 0,
   customQuery: undefined,
   customQueryObject: null,
-  geminiApiKey:
-    typeof window !== "undefined" ? localStorage.getItem("geminiApiKey") : null,
+  geminiApiKey: null, // Will be initialized asynchronously
   isAiLoading: false,
 
   // --- Actions ---
@@ -88,14 +89,52 @@ export const useDatabaseStore = create<DatabaseStore>((set) => ({
   setOffset: (offset) => set({ offset }),
   setCustomQuery: (query) => set({ customQuery: query }),
   setCustomQueryObject: (obj) => set({ customQueryObject: obj }),
-  setGeminiApiKey: (key) => {
+  setGeminiApiKey: async (key) => {
     set({ geminiApiKey: key });
-    if (key) {
-      localStorage.setItem("geminiApiKey", key);
-    } else {
-      localStorage.removeItem("geminiApiKey");
+    try {
+      if (key) {
+        await SecureStorage.setItem("geminiApiKey", key);
+      } else {
+        SecureStorage.removeItem("geminiApiKey");
+      }
+    } catch (error) {
+      console.error("Failed to store API key securely:", error);
+      // Fallback to regular localStorage with warning
+      console.warn("Falling back to localStorage for API key storage");
+      if (key) {
+        localStorage.setItem("geminiApiKey", key);
+      } else {
+        localStorage.removeItem("geminiApiKey");
+      }
     }
   },
   setIsAiLoading: (loading) => set({ isAiLoading: loading }),
-  resetPagination: () => set({ offset: 0 })
+  resetPagination: () => set({ offset: 0 }),
+  initializeApiKey: async () => {
+    try {
+      const key = await SecureStorage.getItem("geminiApiKey");
+      if (key) {
+        set({ geminiApiKey: key });
+      } else {
+        // Check for legacy localStorage key and migrate
+        const legacyKey =
+          typeof window !== "undefined"
+            ? localStorage.getItem("geminiApiKey")
+            : null;
+        if (legacyKey) {
+          await SecureStorage.setItem("geminiApiKey", legacyKey);
+          localStorage.removeItem("geminiApiKey");
+          set({ geminiApiKey: legacyKey });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to initialize API key:", error);
+      // Fallback to localStorage
+      const key =
+        typeof window !== "undefined"
+          ? localStorage.getItem("geminiApiKey")
+          : null;
+      set({ geminiApiKey: key });
+    }
+  }
 }));

@@ -6,7 +6,16 @@ const useKeyPress = (
   caseSensitive = false
 ) => {
   useEffect(() => {
+    // Guard against invalid inputs
+    if (!keyCombo || typeof keyCombo !== "string" || !callback) {
+      return;
+    }
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Guard against undefined event.key
+      if (!event.key) {
+        return;
+      }
+
       const keys = keyCombo.split("+");
       const isCtrlRequired = keys.includes("ctrl");
 

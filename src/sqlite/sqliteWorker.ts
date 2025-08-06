@@ -6,24 +6,61 @@ import type { WorkerEvent } from "@/types";
 // Global variable to store the database instance
 let instance: Sqlite | null = null;
 
+// Cleanup function to properly dispose of resources
+function cleanup() {
+  if (instance) {
+    try {
+      // Close database connection if available
+      if (instance.db && typeof instance.db.close === "function") {
+        instance.db.close();
+      }
+    } catch (error) {
+      console.warn("Error during database cleanup:", error);
+    } finally {
+      instance = null;
+    }
+  }
+}
+
+// Handle worker termination
+self.addEventListener("beforeunload", cleanup);
+self.addEventListener("unload", cleanup);
+
 self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
   const { action, payload } = event.data;
 
   // Create a new database instance
   if (action === "init") {
-    instance = await Sqlite.create();
+    try {
+      // Clean up existing instance first
+      cleanup();
 
-    // Send the initialization response to the main thread
-    self.postMessage({
-      action: "initComplete",
-      payload: {
-        tableSchema: instance.tablesSchema,
-        indexSchema: instance.indexesSchema,
-        currentTable: instance.firstTable
-      }
-    });
+      instance = await Sqlite.create();
 
-    return;
+      // Send the initialization response to the main thread
+      self.postMessage({
+        action: "initComplete",
+        payload: {
+          tableSchema: instance.tablesSchema,
+          indexSchema: instance.indexesSchema,
+          currentTable: instance.firstTable
+        }
+      });
+
+      return;
+    } catch (error) {
+      console.error("Worker: Failed to initialize database:", error);
+      self.postMessage({
+        action: "queryError",
+        payload: {
+          error: {
+            message: `Failed to initialize database: ${error instanceof Error ? error.message : String(error)}`,
+            isCustomQueryError: false
+          }
+        }
+      });
+      return;
+    }
   }
 
   // Check if the database instance is initialized
@@ -46,6 +83,9 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
     // Updates the instance from user-uploaded file
     switch (action) {
       case "openFile": {
+        // Clean up existing instance first
+        cleanup();
+
         instance = await Sqlite.open(new Uint8Array(payload.file));
 
         if (instance.firstTable === null) {
@@ -134,6 +174,74 @@ self.onmessage = async (event: MessageEvent<WorkerEvent>) => {
         } catch (error) {
           // If the query throws an error
           // User for error messages
+          if (error instanceof Error) {
+            throw new CustomQueryError(error.message);
+          }
+        }
+
+        break;
+      }
+      // Executes multiple SQL statements as a batch
+      case "execBatch": {
+        try {
+          const { queries, currentTable, limit, offset, filters, sorters } =
+            payload;
+
+          let hasTablesChanged = false;
+          let lastResults = null;
+
+          // Execute all queries in sequence
+          for (const query of queries) {
+            const [results, doTablesChanged] = instance.exec(query);
+
+            if (doTablesChanged) {
+              hasTablesChanged = true;
+            }
+
+            // Keep the last results that returned data
+            if (results.length > 0) {
+              lastResults = results;
+            }
+          }
+
+          // Check if tables changed during batch execution
+          if (hasTablesChanged) {
+            // Send the update response to the main thread
+            self.postMessage({
+              action: "updateInstance",
+              payload: {
+                tableSchema: instance.tablesSchema,
+                indexSchema: instance.indexesSchema
+              }
+            });
+          } else {
+            // Check if any query returned results
+            if (lastResults && lastResults.length > 0) {
+              // Send the custom query response to the main thread
+              self.postMessage({
+                action: "customQueryComplete",
+                payload: { results: lastResults }
+              });
+              return;
+            }
+
+            // If not, return the table data
+            const [tableResults, maxSize] = instance.getTableData(
+              currentTable,
+              limit,
+              offset,
+              filters,
+              sorters
+            );
+
+            // Send the table data response to the main thread
+            self.postMessage({
+              action: "queryComplete",
+              payload: { results: tableResults, maxSize }
+            });
+          }
+        } catch (error) {
+          // If any query in the batch throws an error
           if (error instanceof Error) {
             throw new CustomQueryError(error.message);
           }

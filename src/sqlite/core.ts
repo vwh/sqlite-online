@@ -1,8 +1,9 @@
 import initSqlJs from "sql.js";
 
 import DEMO_DB from "./demo-db";
+import { tableDataCache } from "@/lib/queryCache";
 
-import type { Database, SqlJsStatic, SqlValue } from "sql.js";
+import type { Database, SqlJsStatic, SqlValue, QueryExecResult } from "sql.js";
 import type {
   Filters,
   IndexSchema,
@@ -15,7 +16,7 @@ export default class Sqlite {
   // Static SQL.js instance
   static readonly sqlJsStatic?: SqlJsStatic;
   // Database instance
-  private readonly db: Database;
+  public readonly db: Database;
 
   public firstTable: string | null = null;
   public tablesSchema: TableSchema = {};
@@ -35,9 +36,17 @@ export default class Sqlite {
 
   private static async initSQLjs(): Promise<SqlJsStatic> {
     if (Sqlite.sqlJsStatic) return Sqlite.sqlJsStatic;
-    return await initSqlJs({
-      locateFile: (file) => `${import.meta.env.BASE_URL}wasm/${file}`
-    });
+    try {
+      const SQL = await initSqlJs({
+        locateFile: (file) => `${import.meta.env.BASE_URL}wasm/${file}`
+      });
+      return SQL;
+    } catch (error) {
+      console.error("Core: Failed to initialize SQL.js:", error);
+      throw new Error(
+        `Failed to initialize SQL.js: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   // Initialize a new database
@@ -157,14 +166,23 @@ export default class Sqlite {
   // Get the max size of the requested table
   // Used for pagination
   private getMaxSizeOfTable(tableName: string, filters?: Filters) {
-    const [results] = this.exec(`
-      SELECT COUNT(*) FROM "${tableName}"
-      ${buildWhereClause(filters)}
-    `);
+    const { clause, params } = buildWhereClause(filters);
+    const quotedTableName = sanitizeColumnName(tableName);
 
-    if (results.length === 0) return 0;
+    const query = `SELECT COUNT(*) FROM ${quotedTableName} ${clause}`;
 
-    return Math.ceil(results[0].values[0][0] as number);
+    if (params.length > 0) {
+      const stmt = this.db.prepare(query);
+      stmt.bind(params);
+      stmt.step();
+      const result = stmt.get();
+      stmt.free();
+      return Math.ceil((result as SqlValue[])[0] as number);
+    } else {
+      const [results] = this.exec(query);
+      if (results.length === 0) return 0;
+      return Math.ceil(results[0].values[0][0] as number);
+    }
   }
 
   // Get the data for the requested table
@@ -176,21 +194,66 @@ export default class Sqlite {
     filters?: Filters,
     sorters?: Sorters
   ) {
+    // Validate limit and offset to prevent injection
+    const safeLimit = Math.max(1, Math.min(10000, Math.floor(Number(limit))));
+    const safeOffset = Math.max(0, Math.floor(Number(offset)));
+
+    // Check cache first
+    const cachedResult = tableDataCache.get(
+      table,
+      safeLimit,
+      safeOffset,
+      filters,
+      sorters
+    );
+    if (
+      cachedResult &&
+      Array.isArray(cachedResult) &&
+      cachedResult.length === 2
+    ) {
+      return cachedResult as unknown as readonly [QueryExecResult[], number];
+    }
+
     const primaryKey = this.getPrimaryKey(table);
-    const selectClause = primaryKey ? `${primaryKey}, *` : "*";
+    const quotedTable = sanitizeColumnName(table);
+    const selectClause = primaryKey
+      ? `${sanitizeColumnName(primaryKey)}, *`
+      : "*";
 
-    const [results] = this.exec(`
-      SELECT ${selectClause} FROM "${table}"
-      ${buildWhereClause(filters)}
-      ${buildOrderByClause(sorters)}
-      LIMIT ${limit} OFFSET ${offset}
-    `);
+    const { clause: whereClause, params } = buildWhereClause(filters);
+    const orderByClause = buildOrderByClause(sorters);
 
-    // If the table is empty return an empty array
-    if (results.length === 0) return [];
+    const query = `
+      SELECT ${selectClause} FROM ${quotedTable}
+      ${whereClause}
+      ${orderByClause}
+      LIMIT ${safeLimit} OFFSET ${safeOffset}
+    `;
+
+    let results;
+    if (params.length > 0) {
+      const stmt = this.db.prepare(query);
+      stmt.bind(params);
+      const values: SqlValue[][] = [];
+      while (stmt.step()) {
+        values.push(stmt.get());
+      }
+      results = [{ columns: stmt.getColumnNames(), values }];
+      stmt.free();
+    } else {
+      [results] = this.exec(query);
+    }
+
+    // If the table is empty return empty results with zero count
+    if (results.length === 0) return [[], 0] as const;
 
     const maxSize = this.getMaxSizeOfTable(table, filters);
-    return [results, maxSize] as const;
+    const result = [results, maxSize] as const;
+
+    // Cache the result
+    tableDataCache.set(table, safeLimit, safeOffset, result, filters, sorters);
+
+    return result;
   }
 
   // Get the primary key of a table
@@ -231,6 +294,9 @@ export default class Sqlite {
       const stmt = this.db.prepare(query);
       stmt.run([...values, id]); // Primary key is the last parameter
       stmt.free();
+
+      // Invalidate cache for this table
+      tableDataCache.invalidateTable(table);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(
@@ -257,6 +323,9 @@ export default class Sqlite {
       const stmt = this.db.prepare(query);
       stmt.run([id]);
       stmt.free();
+
+      // Invalidate cache for this table
+      tableDataCache.invalidateTable(table);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(
@@ -289,6 +358,9 @@ export default class Sqlite {
       const stmt = this.db.prepare(query);
       stmt.run([...filteredValues]);
       stmt.free();
+
+      // Invalidate cache for this table
+      tableDataCache.invalidateTable(table);
     } catch (error) {
       throw new Error(`Error while inserting into table ${table}: ${error}`);
     }
@@ -310,15 +382,44 @@ export default class Sqlite {
     sorters?: Sorters;
     customQuery?: string;
   }) {
-    let query = customQuery;
-    if (!query) {
-      query = `SELECT * FROM "${table}" ${buildWhereClause(
-        filters
-      )} ${buildOrderByClause(sorters)}`;
-      if (offset && limit) query += ` LIMIT ${limit} OFFSET ${offset}`;
+    if (customQuery) {
+      const [results] = this.exec(customQuery);
+      return results;
     }
-    const [results] = this.exec(query);
-    return results;
+
+    if (!table) {
+      throw new Error("Table name is required when not using custom query");
+    }
+
+    const quotedTable = sanitizeColumnName(table);
+    const { clause: whereClause, params } = buildWhereClause(filters);
+    const orderByClause = buildOrderByClause(sorters);
+
+    let query = `SELECT * FROM ${quotedTable} ${whereClause} ${orderByClause}`;
+
+    if (offset && limit) {
+      const safeLimit = Math.max(
+        1,
+        Math.min(100000, Math.floor(Number(limit)))
+      );
+      const safeOffset = Math.max(0, Math.floor(Number(offset)));
+      query += ` LIMIT ${safeLimit} OFFSET ${safeOffset}`;
+    }
+
+    if (params.length > 0) {
+      const stmt = this.db.prepare(query);
+      stmt.bind(params);
+      const values: SqlValue[][] = [];
+      while (stmt.step()) {
+        values.push(stmt.get());
+      }
+      const results = [{ columns: stmt.getColumnNames(), values }];
+      stmt.free();
+      return results;
+    } else {
+      const [results] = this.exec(query);
+      return results;
+    }
   }
 }
 
@@ -328,24 +429,50 @@ function isStructureChangeable(sql: string) {
   return match !== null;
 }
 
-// Build the WHERE clause for a SQL statement
-function buildWhereClause(filters?: Filters) {
-  if (!filters) return "";
+// Simple column name quoting for SQL
+function sanitizeColumnName(columnName: string): string {
+  return `"${columnName.replace(/"/g, '""')}"`;
+}
 
-  const filtersArray = Object.entries(filters)
-    .map(([column, value]) => `${column} LIKE '%${value}%' ESCAPE '\\'`)
-    .join(" AND ");
-  return `WHERE ${filtersArray}`;
+// Simple sort order normalization
+function sanitizeSortOrder(order: string): string {
+  const normalizedOrder = order.toUpperCase().trim();
+  return normalizedOrder === "DESC" ? "DESC" : "ASC";
+}
+
+// Build the WHERE clause for a SQL statement with parameterized queries
+function buildWhereClause(filters?: Filters): {
+  clause: string;
+  params: string[];
+} {
+  if (!filters) return { clause: "", params: [] };
+
+  const conditions: string[] = [];
+  const params: string[] = [];
+
+  Object.entries(filters).forEach(([column, value]) => {
+    const quotedColumn = sanitizeColumnName(column);
+    conditions.push(`${quotedColumn} LIKE ? ESCAPE '\\'`);
+    params.push(`%${value}%`);
+  });
+
+  return {
+    clause: conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "",
+    params
+  };
 }
 
 // Build the ORDER BY clause for a SQL statement
-function buildOrderByClause(sorters?: Sorters) {
+function buildOrderByClause(sorters?: Sorters): string {
   if (!sorters) return "";
 
-  const sortersArray = Object.entries(sorters)
-    .map(([column, order]) => `${column} ${order}`)
-    .join(", ");
-  return `ORDER BY ${sortersArray}`;
+  const sortersArray = Object.entries(sorters).map(([column, order]) => {
+    const quotedColumn = sanitizeColumnName(column);
+    const normalizedOrder = sanitizeSortOrder(order);
+    return `${quotedColumn} ${normalizedOrder}`;
+  });
+
+  return sortersArray.length > 0 ? `ORDER BY ${sortersArray.join(", ")}` : "";
 }
 
 // Convert an array of objects to a CSV string

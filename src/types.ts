@@ -65,6 +65,18 @@ interface ExecEvent {
   };
 }
 
+interface ExecBatchEvent {
+  action: "execBatch";
+  payload: {
+    queries: string[];
+    currentTable: string;
+    limit: number;
+    offset: number;
+    filters: Filters;
+    sorters: Sorters;
+  };
+}
+
 interface GetTableDataEvent {
   action: "getTableData";
   payload: {
@@ -126,6 +138,7 @@ export type WorkerEvent =
   | OpenFileEvent
   | RefreshEvent
   | ExecEvent
+  | ExecBatchEvent
   | GetTableDataEvent
   | DownloadEvent
   | UpdateEvent

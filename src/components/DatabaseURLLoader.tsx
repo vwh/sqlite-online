@@ -107,7 +107,7 @@ function DatabaseURLLoader() {
         fetchInProgress.current = false;
       }
     },
-    [handleFileUpload, isValidURL, setDatabaseLoading]
+    [handleFileUpload, setDatabaseLoading]
   );
 
   useEffect(() => {

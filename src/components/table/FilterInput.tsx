@@ -28,7 +28,7 @@ function FilterInput({
     }, debounceTime);
 
     return handler;
-  }, [onChange, debounceTime]);
+  }, [debounceTime]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

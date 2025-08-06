@@ -63,11 +63,29 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
 
   // Initialize worker and send initial "init" message
   useEffect(() => {
-    // Create a new worker
-    workerRef.current = new Worker(
-      new URL("@/sqlite/sqliteWorker.ts", import.meta.url),
-      { type: "module" }
-    );
+    try {
+      // Create a new worker
+      workerRef.current = new Worker(
+        new URL("@/sqlite/sqliteWorker.ts", import.meta.url),
+        { type: "module" }
+      );
+
+      // Add error handler for worker
+      workerRef.current.onerror = (error) => {
+        console.error("Main: Worker error:", error);
+        setErrorMessage("Worker failed to initialize");
+        setIsDatabaseLoading(false);
+      };
+
+      workerRef.current.onmessageerror = (error) => {
+        console.error("Main: Worker message error:", error);
+      };
+    } catch (error) {
+      console.error("Main: Failed to create worker:", error);
+      setErrorMessage("Failed to create worker");
+      setIsDatabaseLoading(false);
+      return;
+    }
 
     // Listen for messages from the worker
     workerRef.current.onmessage = (
@@ -81,6 +99,13 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
         window.parent.postMessage({ type: "loadDatabaseBufferReady" }, "*");
 
         const { payload } = workerEvent;
+
+        if (!payload.currentTable) {
+          console.error("Main: No current table found in payload");
+          setErrorMessage("No tables found in database");
+          setIsDatabaseLoading(false);
+          return;
+        }
 
         setTablesSchema(payload.tableSchema);
         setIndexesSchema(payload.indexSchema);
@@ -224,7 +249,10 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
     workerRef.current.postMessage({ action: "init" });
 
     return () => {
-      workerRef.current?.terminate();
+      // Simple cleanup - just terminate the worker
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
     };
   }, [
     setColumns,
@@ -248,7 +276,9 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
 
   // When fetching data, ask the worker for new data
   useEffect(() => {
-    if (!currentTable) return;
+    if (!currentTable) {
+      return;
+    }
     const handler = setTimeout(() => {
       if (!workerRef.current) {
         showToast("Worker is not initialized", "error");
@@ -525,20 +555,37 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
     const cleanedQuery = query
       .replace(/--.*$/gm, "")
       .replace(/\/\*[\s\S]*?\*\//g, "");
+
     // Split the query into multiple statements
     const statements = cleanedQuery
       .split(";")
       .map((stmt) => stmt.trim())
       .filter((stmt) => stmt !== "");
 
-    for (const stmt of statements) {
-      setIsDataLoading(true);
+    if (statements.length === 0) return;
 
-      // Request the worker to execute the query
+    setIsDataLoading(true);
+
+    // Send all statements as a batch to improve performance
+    if (statements.length === 1) {
+      // Single statement - send directly
       workerRef.current.postMessage({
         action: "exec",
         payload: {
-          query: stmt,
+          query: statements[0],
+          currentTable,
+          filters,
+          sorters,
+          limit,
+          offset
+        }
+      });
+    } else {
+      // Multiple statements - send as batch
+      workerRef.current.postMessage({
+        action: "execBatch",
+        payload: {
+          queries: statements,
           currentTable,
           filters,
           sorters,
