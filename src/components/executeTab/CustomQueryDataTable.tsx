@@ -27,50 +27,69 @@ function CustomQueryDataTable() {
     return customQueryObject.columns.map((column, columnIndex) => {
       const maxContentLength = Math.max(
         column.length,
-        ...customQueryObject.data.slice(0, 100).map(row =>
-          String(row[columnIndex] || '').length
-        )
+        ...customQueryObject.data
+          .slice(0, 100)
+          .map((row) => String(row[columnIndex] || "").length)
       );
-      return Math.max(MIN_COLUMN_WIDTH, Math.min(maxContentLength * 8 + 32, 300));
+      return Math.max(
+        MIN_COLUMN_WIDTH,
+        Math.min(maxContentLength * 8 + 32, 300)
+      );
     });
   }, [customQueryObject]);
 
   // Calculate column widths based on content and available space
-  const getColumnWidth = useCallback((columnIndex: number, containerWidth?: number) => {
-    if (!customQueryObject || !columnWidths[columnIndex]) return MIN_COLUMN_WIDTH;
+  const getColumnWidth = useCallback(
+    (columnIndex: number, containerWidth?: number) => {
+      if (!customQueryObject || !columnWidths[columnIndex])
+        return MIN_COLUMN_WIDTH;
 
-    const contentBasedWidth = columnWidths[columnIndex];
+      const contentBasedWidth = columnWidths[columnIndex];
 
-    // If we have container width, ensure table fills the full width
-    if (containerWidth) {
-      const totalContentWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+      // If we have container width, ensure table fills the full width
+      if (containerWidth) {
+        const totalContentWidth = columnWidths.reduce(
+          (sum, width) => sum + width,
+          0
+        );
 
-      // If content width is less than container, distribute extra space
-      if (totalContentWidth < containerWidth) {
-        const extraSpace = containerWidth - totalContentWidth;
-        const extraPerColumn = extraSpace / customQueryObject.columns.length;
-        return contentBasedWidth + extraPerColumn;
+        // If content width is less than container, distribute extra space
+        if (totalContentWidth < containerWidth) {
+          const extraSpace = containerWidth - totalContentWidth;
+          const extraPerColumn = extraSpace / customQueryObject.columns.length;
+          return contentBasedWidth + extraPerColumn;
+        }
       }
-    }
 
-    return contentBasedWidth;
-  }, [customQueryObject, columnWidths]);
+      return contentBasedWidth;
+    },
+    [customQueryObject, columnWidths]
+  );
 
   const getRowHeight = useCallback(() => ROW_HEIGHT, []);
 
   // Synchronize horizontal scrolling between header and grid
-  const handleGridScroll = useCallback(({ scrollLeft }: { scrollLeft: number }) => {
-    if (headerScrollRef.current) {
-      headerScrollRef.current.scrollLeft = scrollLeft;
-    }
-  }, []);
+  const handleGridScroll = useCallback(
+    ({ scrollLeft }: { scrollLeft: number }) => {
+      if (headerScrollRef.current) {
+        headerScrollRef.current.scrollLeft = scrollLeft;
+      }
+    },
+    []
+  );
 
-  const getTotalWidth = useCallback((containerWidth: number) => {
-    if (!customQueryObject || !columnWidths.length) return containerWidth;
+  const getTotalWidth = useCallback(
+    (containerWidth: number) => {
+      if (!customQueryObject || !columnWidths.length) return containerWidth;
 
-    const totalContentWidth = columnWidths.reduce((sum, width) => sum + width, 0);
-    return Math.max(totalContentWidth, containerWidth);
-  }, [customQueryObject, columnWidths]);
+      const totalContentWidth = columnWidths.reduce(
+        (sum, width) => sum + width,
+        0
+      );
+      return Math.max(totalContentWidth, containerWidth);
+    },
+    [customQueryObject, columnWidths]
+  );
 
   // Reset grid cache when query changes to handle resize properly
   useEffect(() => {
@@ -169,23 +188,20 @@ function CustomQueryDataTable() {
                 {/* Fixed Header with Horizontal Scroll */}
                 <div
                   ref={headerScrollRef}
-                  className="bg-primary/5 border-b overflow-x-auto overflow-y-hidden scrollbar-hide"
+                  className="bg-primary/5 scrollbar-hide overflow-x-auto overflow-y-hidden border-b"
                   style={{
                     height: ROW_HEIGHT,
                     width: width
                   }}
                 >
-                  <div
-                    className="flex"
-                    style={{ width: tableWidth }}
-                  >
+                  <div className="flex" style={{ width: tableWidth }}>
                     {customQueryObject.columns.map((column, columnIndex) => (
                       <div
                         key={`${column}-${columnIndex}`}
-                        className="p-2 text-xs font-medium border-r border-primary/10 flex-shrink-0 flex items-center"
+                        className="border-primary/10 flex flex-shrink-0 items-center border-r p-2 text-xs font-medium"
                         style={{ width: getColumnWidth(columnIndex, width) }}
                       >
-                        <Span className="text-foreground capitalize truncate">
+                        <Span className="text-foreground truncate capitalize">
                           {column}
                         </Span>
                       </div>
@@ -205,17 +221,19 @@ function CustomQueryDataTable() {
                   onScroll={handleGridScroll}
                   overscanColumnCount={2}
                   overscanRowCount={5}
-                  key={`grid-${customQueryObject.columns.join('-')}`}
+                  key={`grid-${customQueryObject.columns.join("-")}`}
                 >
                   {({ columnIndex, rowIndex, style }) => {
                     const value = customQueryObject.data[rowIndex][columnIndex];
                     return (
                       <div
                         style={style}
-                        className="border-primary/5 border-t border-r p-2 flex items-center hover:bg-primary/5"
+                        className="border-primary/5 hover:bg-primary/5 flex items-center border-t border-r p-2"
                       >
                         {value !== null ? (
-                          <Span className="text-xs truncate">{String(value)}</Span>
+                          <Span className="truncate text-xs">
+                            {String(value)}
+                          </Span>
                         ) : (
                           <Badge>NULL</Badge>
                         )}
