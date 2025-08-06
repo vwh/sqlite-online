@@ -136,7 +136,7 @@ export default class Sqlite {
     this.firstTable = null;
 
     const [results] = this.exec(
-      "SELECT type, name, tbl_name FROM sqlite_master WHERE name != 'sqlite_sequence'"
+      "SELECT type, name, tbl_name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"
     );
 
     if (results.length === 0) return;
