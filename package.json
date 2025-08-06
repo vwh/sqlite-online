@@ -32,7 +32,7 @@
     "gh-pages": "^6.3.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.476.0",
-    "react": "^19.1.0",
+    "react": "^19.1.1",
     "react-dom": "^19.1.0",
     "react-resizable-panels": "^2.1.7",
     "react-virtualized-auto-sizer": "^1.0.26",
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/node": "^22.13.10",
-    "@types/react": "^19.1.2",
+    "@types/react": "^19.1.9",
     "@types/react-dom": "^19.0.4",
     "@types/react-window": "^1.8.8",
     "@types/sql.js": "^1.4.9",
