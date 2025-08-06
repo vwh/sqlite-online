@@ -45,14 +45,30 @@ function FilterInput({
     };
   }, [debouncedOnChange]);
 
+  const filterId = `filter-${column}`;
+  const labelId = `filter-label-${column}`;
+
   return (
-    <Input
-      type="text"
-      className="border-primary/20 max-h-6 w-full rounded px-2 py-1 text-[0.8rem]"
-      value={inputValue}
-      onChange={handleChange}
-      placeholder="Filter"
-    />
+    <div className="relative">
+      <label htmlFor={filterId} id={labelId} className="sr-only">
+        Filter {column} column
+      </label>
+      <Input
+        id={filterId}
+        type="text"
+        className="border-primary/20 max-h-6 w-full rounded px-2 py-1 text-[0.8rem]!"
+        value={inputValue}
+        onChange={handleChange}
+        placeholder="Filter"
+        aria-labelledby={labelId}
+        aria-describedby={`${filterId}-description`}
+        title={`Filter rows by ${column} column values`}
+      />
+      <span id={`${filterId}-description`} className="sr-only">
+        Type to filter table rows by {column} column values. Results update
+        automatically as you type.
+      </span>
+    </div>
   );
 }
 

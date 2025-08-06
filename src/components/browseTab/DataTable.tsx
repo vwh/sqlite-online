@@ -26,6 +26,7 @@ function DataTable() {
   const currentTable = useDatabaseStore((state) => state.currentTable);
   const tablesSchema = useDatabaseStore((state) => state.tablesSchema);
   const filters = useDatabaseStore((state) => state.filters);
+  const sorters = useDatabaseStore((state) => state.sorters);
   const setFilters = useDatabaseStore((state) => state.setFilters);
 
   const { handleQueryFilter } = useDatabaseWorker();
@@ -82,78 +83,119 @@ function DataTable() {
   }, [columns, filters, handleQueryFilter]);
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-primary/5">
-          {columns && currentTable ? (
-            columns.map((column, index) => (
-              <TableHead key={column} className="p-1 text-xs">
-                <div className="flex items-center gap-1 py-[1.5px]">
-                  <SorterButton column={column} />
-                  <Span className="text-foreground font-medium capitalize">
-                    {column}
-                  </Span>
-                  <ColumnIcon
-                    columnSchema={tablesSchema[currentTable].schema[index]}
-                  />
-                </div>
-                {memoizedFilterInput?.[index]}
+    <div role="region" aria-label="Database table data" aria-live="polite">
+      <Table
+        role="table"
+        aria-label={
+          currentTable ? `Data from ${currentTable} table` : "Database table"
+        }
+      >
+        <TableHeader>
+          <TableRow className="bg-primary/5" role="row">
+            {columns && currentTable ? (
+              columns.map((column, index) => (
+                <TableHead
+                  key={column}
+                  className="p-1 text-xs"
+                  role="columnheader"
+                  aria-sort={
+                    sorters?.[column] === "asc"
+                      ? "ascending"
+                      : sorters?.[column] === "desc"
+                        ? "descending"
+                        : "none"
+                  }
+                >
+                  <div className="flex items-center gap-1 py-[1.5px]">
+                    <SorterButton column={column} />
+                    <Span className="text-foreground font-medium capitalize">
+                      {column}
+                    </Span>
+                    <ColumnIcon
+                      columnSchema={tablesSchema[currentTable].schema[index]}
+                    />
+                  </div>
+                  {memoizedFilterInput?.[index]}
+                </TableHead>
+              ))
+            ) : (
+              <TableHead role="columnheader">
+                <p className="text-xs">No columns found</p>
               </TableHead>
-            ))
-          ) : (
-            <TableHead>
-              <p className="text-xs">No columns found</p>
-            </TableHead>
-          )}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data && data.length > 0 ? (
-          data.map((row, i) => {
-            const isView = tablesSchema[currentTable!]?.type === "view";
-            const primaryKey = tablesSchema[currentTable!]?.primaryKey;
-            const primaryValue = primaryKey && !isView ? row[0] : null;
-            const displayData = primaryKey && !isView ? row.slice(1) : row;
-
-            return (
-              <TableRow
-                key={i}
-                onClick={() => handleRowClick(displayData, i, primaryValue)}
-                className="hover:bg-primary/5 focus:bg-primary/5 cursor-pointer text-xs"
-              >
-                {displayData.map((value, j) => (
-                  <TableCell key={j} className="border-primary/5 border-t p-2">
-                    {value === null ? (
-                      <Badge>
-                        {value === null ? "NULL" : JSON.stringify(value)}
-                      </Badge>
-                    ) : (
-                      <>
-                        {tablesSchema[currentTable!].schema[j]?.type ===
-                        "BLOB" ? (
-                          <Badge>BLOB</Badge>
-                        ) : (
-                          <Span className="text-xs">{value}</Span>
-                        )}
-                      </>
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            );
-          })
-        ) : (
-          <TableRow>
-            <TableCell
-              colSpan={columns?.length ?? 1}
-              className="h-32 text-center"
-            >
-              {emptyDataContent}
-            </TableCell>
+            )}
           </TableRow>
-        )}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {data && data.length > 0 ? (
+            data.map((row, i) => {
+              const isView = tablesSchema[currentTable!]?.type === "view";
+              const primaryKey = tablesSchema[currentTable!]?.primaryKey;
+              const primaryValue = primaryKey && !isView ? row[0] : null;
+              const displayData = primaryKey && !isView ? row.slice(1) : row;
+
+              return (
+                <TableRow
+                  key={i}
+                  onClick={() => handleRowClick(displayData, i, primaryValue)}
+                  className="hover:bg-primary/5 focus:bg-primary/5 focus:ring-ring cursor-pointer text-xs focus:ring-2 focus:ring-offset-1 focus:outline-none"
+                  role="row"
+                  tabIndex={0}
+                  aria-label={`Row ${i + 1} of ${data.length}, click to edit`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleRowClick(displayData, i, primaryValue);
+                    }
+                  }}
+                >
+                  {displayData.map((value, j) => (
+                    <TableCell
+                      key={j}
+                      className="border-primary/5 border-t p-2"
+                      role="cell"
+                      aria-label={`${columns?.[j] || `Column ${j + 1}`}: ${
+                        value === null
+                          ? "NULL"
+                          : tablesSchema[currentTable!].schema[j]?.type ===
+                              "BLOB"
+                            ? "BLOB data"
+                            : String(value)
+                      }`}
+                    >
+                      {value === null ? (
+                        <Badge aria-label="NULL value">
+                          {value === null ? "NULL" : JSON.stringify(value)}
+                        </Badge>
+                      ) : (
+                        <>
+                          {tablesSchema[currentTable!].schema[j]?.type ===
+                          "BLOB" ? (
+                            <Badge aria-label="Binary data">BLOB</Badge>
+                          ) : (
+                            <Span className="text-xs">{value}</Span>
+                          )}
+                        </>
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })
+          ) : (
+            <TableRow role="row">
+              <TableCell
+                colSpan={columns?.length ?? 1}
+                className="h-32 text-center"
+                role="cell"
+                aria-label="No data available"
+              >
+                {emptyDataContent}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
 
