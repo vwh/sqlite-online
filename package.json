@@ -25,7 +25,7 @@
     "@radix-ui/react-tabs": "^1.1.3",
     "@tailwindcss/vite": "^4.0.9",
     "@types/lodash": "^4.17.16",
-    "@uiw/codemirror-theme-darcula": "^4.23.10",
+    "@uiw/codemirror-theme-darcula": "^4.25.2",
     "@uiw/react-codemirror": "^4.23.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
