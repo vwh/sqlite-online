@@ -1,4 +1,5 @@
 import { useDatabaseStore } from "@/store/useDatabaseStore";
+import usePanelManager from "@/hooks/usePanel";
 import useDatabaseWorker from "@/hooks/useWorker";
 
 import type { Filters, Sorters } from "@/types";
@@ -17,6 +18,7 @@ function ActionButtons({ filters, sorters }: Readonly<ActionButtonsProps>) {
   const setFilters = useDatabaseStore((state) => state.setFilters);
   const setSorters = useDatabaseStore((state) => state.setSorters);
   const { handleExport } = useDatabaseWorker();
+  const { setSelectedRowObject } = usePanelManager();
 
   const hasFilters = filters != null;
   const hasSorters = sorters != null;
@@ -34,7 +36,10 @@ function ActionButtons({ filters, sorters }: Readonly<ActionButtonsProps>) {
           size="sm"
           variant="outline"
           className="h-8 text-xs"
-          onClick={() => setFilters(null)}
+          onClick={() => {
+            setFilters(null);
+            setSelectedRowObject(null);
+          }}
           disabled={!hasFilters}
           aria-label={
             hasFilters
@@ -56,7 +61,10 @@ function ActionButtons({ filters, sorters }: Readonly<ActionButtonsProps>) {
           size="sm"
           variant="outline"
           className="h-8 text-xs"
-          onClick={() => setSorters(null)}
+          onClick={() => {
+            setSorters(null);
+            setSelectedRowObject(null);
+          }}
           disabled={!hasSorters}
           aria-label={
             hasSorters
