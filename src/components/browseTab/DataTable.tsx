@@ -30,7 +30,7 @@ function DataTable() {
   const setFilters = useDatabaseStore((state) => state.setFilters);
 
   const { handleQueryFilter } = useDatabaseWorker();
-  const { handleRowClick } = usePanelManager();
+  const { handleRowClick, selectedRowObject } = usePanelManager();
 
   const emptyDataContent = useMemo(
     () => (
@@ -137,8 +137,11 @@ function DataTable() {
                 <TableRow
                   key={i}
                   onClick={() => handleRowClick(displayData, i, primaryValue)}
-                  className="hover:bg-primary/5 focus:bg-primary/5 focus:ring-ring cursor-pointer text-xs focus:ring-2 focus:ring-offset-1 focus:outline-none"
+                  className="hover:bg-primary/5 focus:bg-primary/5 data-[state=selected]:bg-primary/5 focus:ring-ring cursor-pointer text-xs focus:ring-2 focus:ring-offset-1 focus:outline-none"
                   role="row"
+                  data-state={
+                    selectedRowObject?.index === i ? "selected" : undefined
+                  }
                   tabIndex={0}
                   aria-label={`Row ${i + 1} of ${data.length}, click to edit`}
                   onKeyDown={(e) => {

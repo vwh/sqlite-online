@@ -70,10 +70,7 @@ const TableRow = function TableRow({
   return (
     <tr
       data-slot="table-row"
-      className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
-        className
-      )}
+      className={cn("hover:bg-muted/50 border-b transition-colors", className)}
       {...props}
     />
   );

@@ -453,9 +453,10 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
       const newFilters = { ...currentFilters, [column]: value };
 
       setFilters(newFilters);
+      setSelectedRowObject(null);
       resetPagination();
     },
-    [setFilters, resetPagination]
+    [setFilters, setSelectedRowObject, resetPagination]
   );
 
   // Handle when user updates the sorter
@@ -470,8 +471,9 @@ const DatabaseWorkerProvider = ({ children }: DatabaseWorkerProviderProps) => {
         : { [column]: newSortOrder };
 
       setSorters(newSorters as Sorters);
+      setSelectedRowObject(null);
     },
-    [setSorters]
+    [setSorters, setSelectedRowObject]
   );
 
   // Handles when user changes the page

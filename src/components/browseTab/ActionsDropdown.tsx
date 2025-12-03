@@ -34,7 +34,7 @@ function ActionsDropdown({
   sorters,
   handleExport
 }: Readonly<ActionDropdownProps>) {
-  const { isInserting, handleInsert } = usePanelManager();
+  const { isInserting, handleInsert, setSelectedRowObject } = usePanelManager();
   const isView = useDatabaseStore(
     (state) => state.tablesSchema[state.currentTable!]?.type === "view"
   );
@@ -52,7 +52,10 @@ function ActionsDropdown({
             variant="ghost"
             size="sm"
             className="h-8 w-full justify-start text-xs"
-            onClick={() => setFilters(null)}
+            onClick={() => {
+              setFilters(null);
+              setSelectedRowObject(null);
+            }}
             disabled={filters == null}
             title="Clear applied filters"
           >
@@ -65,7 +68,10 @@ function ActionsDropdown({
             variant="ghost"
             size="sm"
             className="h-8 w-full justify-start text-xs"
-            onClick={() => setSorters(null)}
+            onClick={() => {
+              setSorters(null);
+              setSelectedRowObject(null);
+            }}
             disabled={sorters == null}
             title="Reset sorting"
           >
