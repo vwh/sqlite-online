@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=yzua&project=sqlite-online&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 # SQLite Online
 
 <div align="center">
